@@ -196,7 +196,7 @@ function Dashboard() {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold">{r.name}</p>
                     <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
-                      {r.services ? SECTIONS.find((x) => x.id === r.services!.section)?.label ?? "خدمة" : "طلب عام"}
+                      {r.services ? SECTIONS[r.services.section]?.label ?? "خدمة" : "طلب عام"}
                     </span>
                   </div>
                   <p className="text-sm">الخدمة: <span className="font-medium">{r.services?.title ?? "طلب خدمة غير مسجلة"}</span></p>
