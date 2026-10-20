@@ -34,7 +34,7 @@ export const Route = createFileRoute("/services/$id")({
 });
 
 function ServiceDetail() {
-  const service = Route.useLoaderData();
+  const service = Route.useLoaderData() as Service | undefined;
   if (!service) throw notFound();
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
