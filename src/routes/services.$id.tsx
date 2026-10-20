@@ -17,23 +17,24 @@ export const Route = createFileRoute("/services/$id")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  loader: ({ params, context }) => context.queryClient.ensureQueryData({
-    queryKey: ["service", params.id],
-    queryFn: async (): Promise<Service> => {
-      const { data, error } = await (await import("@/integrations/supabase/client")).supabase
-        .from("services").select("*").eq("id", params.id).eq("is_active", true).maybeSingle();
-      if (error) throw error;
-      if (!data) throw notFound();
-      return data as Service;
-    },
-  }),
+  loader: async ({ params }) => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const { data, error } = await supabase
+      .from("services")
+      .select("*")
+      .eq("id", params.id)
+      .eq("is_active", true)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw notFound();
+    return data as Service;
+  },
   notFoundComponent: () => <div className="py-32 text-center text-muted-foreground">الخدمة غير متاحة</div>,
   component: ServiceDetail,
 });
 
 function ServiceDetail() {
   const service = Route.useLoaderData();
-  if (!service) throw notFound();
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
   const isProperty = service.section === "real_estate";
