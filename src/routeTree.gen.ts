@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as GeneralRouteImport } from './routes/general'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RealEstateRouteImport } from './routes/real-estate'
@@ -18,6 +19,11 @@ import { Route as StudentsRouteImport } from './routes/students'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GeneralRoute = GeneralRouteImport.update({
@@ -43,6 +49,7 @@ const StudentsRoute = StudentsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/general': typeof GeneralRoute
   '/login': typeof LoginRoute
   '/real-estate': typeof RealEstateRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/general': typeof GeneralRoute
   '/login': typeof LoginRoute
   '/real-estate': typeof RealEstateRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/general': typeof GeneralRoute
   '/login': typeof LoginRoute
   '/real-estate': typeof RealEstateRoute
@@ -65,14 +74,23 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/general' | '/login' | '/real-estate' | '/students'
+  fullPaths:
+    '/' | '/admin' | '/general' | '/login' | '/real-estate' | '/students'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/general' | '/login' | '/real-estate' | '/students'
-  id: '__root__' | '/' | '/general' | '/login' | '/real-estate' | '/students'
+  to: '/' | '/admin' | '/general' | '/login' | '/real-estate' | '/students'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/general'
+    | '/login'
+    | '/real-estate'
+    | '/students'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   GeneralRoute: typeof GeneralRoute
   LoginRoute: typeof LoginRoute
   RealEstateRoute: typeof RealEstateRoute
@@ -86,6 +104,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/general': {
@@ -121,6 +146,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   GeneralRoute: GeneralRoute,
   LoginRoute: LoginRoute,
   RealEstateRoute: RealEstateRoute,
