@@ -1,10 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, Clock, MapPin, PencilRuler, Phone } from "lucide-react";
 import { SECTIONS, useImageUrl, type Service } from "@/lib/services";
-import { geographicUrl } from "@/lib/service-filters";
 import { sectionText, useSiteContent } from "@/lib/site-content";
 import { RequestForm } from "@/components/site/RequestForm";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/services/$id")({
   head: ({ params }) => ({
@@ -38,8 +36,6 @@ function ServiceDetail() {
   if (!service) throw notFound();
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
-  const isProperty = service.section === "real_estate";
-  const map = geographicUrl(service.map_url, isProperty ? service.location : null);
   const specifications = service.specifications?.trim() || content["service.spec_fallback"];
 
   return (
@@ -79,7 +75,6 @@ function ServiceDetail() {
       <div className="mt-8 rounded-3xl border border-border bg-card p-6 md:p-8">
         <h2 className="text-xl font-bold">طلب هذه الخدمة</h2>
         <p className="mt-2 text-sm text-muted-foreground">أدخل بياناتك وسنتواصل معك لإنجاز طلبك.</p>
-        {map && <Button asChild variant="outline" className="mt-4 w-full md:w-auto"><a href={map} target="_blank" rel="noopener noreferrer"><MapPin className="h-4 w-4" /> {content["service.map_label"]}</a></Button>}
         <div className="mt-6 max-w-2xl"><RequestForm serviceId={service.id} /></div>
       </div>
     </article>
