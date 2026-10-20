@@ -8,6 +8,19 @@ const items = [
 ];
 
 describe("smartSearch", () => {
+  it("recognizes English property hints from Arabic content without keywords", () => {
+    expect(smartSearch("villa sale", [{ title: "فيلا للبيع" }, { title: "شقة للإيجار" }]).map((item) => item.title)).toEqual(["فيلا للبيع"]);
+  });
+  it("recognizes English student hints without manually entered keywords", () => {
+    expect(smartSearch("PowerPoint", [{ title: "تصميم عروض بوربوينت" }])[0]?.title).toBe("تصميم عروض بوربوينت");
+  });
+  it("recognizes English general hints without manually entered keywords", () => {
+    expect(smartSearch("translation", [{ title: "ترجمة المستندات" }, { title: "تجديد الإقامة" }]).map((item) => item.title)).toEqual(["ترجمة المستندات"]);
+  });
+  it("does not match unrelated or partially matched English requests", () => {
+    expect(smartSearch("villa car", [{ title: "فيلا للبيع" }])).toHaveLength(0);
+    expect(smartSearch("translation", [{ title: "فيلا للبيع" }])).toHaveLength(0);
+  });
   it("matches a partial hint", () => {
     expect(smartSearch("اقام", items)[0]?.title).toBe("تجديد الإقامة");
   });

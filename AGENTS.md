@@ -11,7 +11,7 @@
 
 - Services data lives in Cloud tables `services` (section enum + free-text category) and `requests`; admin rights come from `user_roles` via `has_role`, and the first account to sign up becomes admin — keeps setup zero-config for the owner.
 - Service images are in a private `service-images` bucket and shown via signed URLs (`useImageUrl`) because the workspace blocks public buckets.
-- Smart search is client-side in `src/lib/search.ts` (Arabic normalization + typo tolerance); keep its tests passing.
+- Smart search is client-side in `src/lib/search.ts` (Arabic normalization + typo tolerance + curated English-to-Arabic concept aliases in search-aliases.ts); infer matching from existing content without requiring manual keyword edits, and keep its tests passing.
 - Property classifications live in the public-read/admin-write property_classifications table; services reference city/type/purpose IDs with kind validation and restricted deletion. Resolve IDs through the shared module for matching customer filters, preserving legacy category/subcategory data and inferred attributes. Sorting is a view choice based on price/date, never an assigned category.
 - Public service details load active rows through a publishable-key server function; service-specific and general requests share RequestForm and the requests table, with null service_id for general requests.
 - Prebundle dependencies used by lazy routes in Vite optimizeDeps.include so opening a new page does not rediscover dependencies and replace shared React chunks mid-session; preserve the base config's React deduplication.
