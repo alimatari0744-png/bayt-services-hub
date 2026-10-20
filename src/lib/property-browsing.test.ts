@@ -17,5 +17,5 @@ describe("Property browsing", () => {
   it("sorts lowest price first", () => expect(browseProperties(items, { ...EMPTY_PROPERTY_FILTERS, sort: "price_asc" }).map((i) => i.id)).toEqual(["1", "2", "3"]));
   it("sorts newest first", () => expect(browseProperties(items, EMPTY_PROPERTY_FILTERS).map((i) => i.id)).toEqual(["2", "3", "1"]));
   it("parses Arabic price digits", () => expect(numericPropertyPrice("٩٠٠٬٠٠٠ ر.س")).toBe(900000));
-  it("keeps unpriced listings last", () => expect(browseProperties([{ ...items[0], id: "4", price: null }, ...items], { ...EMPTY_PROPERTY_FILTERS, sort: "price_asc" }).map((i) => i.id)).toEqual(["1", "2", "3", "4"]));
+  it("keeps unpriced listings last", () => expect(browseProperties([{ id: "4", title: "أرض للبيع", category: "أراضي", subcategory: "", location: "الدمام", price: null, created_at: "2026-10-04" }, ...items], { ...EMPTY_PROPERTY_FILTERS, sort: "price_asc" }).map((i) => i.id)).toEqual(["1", "2", "3", "4"]));
 });

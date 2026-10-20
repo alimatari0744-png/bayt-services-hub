@@ -1,11 +1,13 @@
-- [x] Remove general/student category filters and refine four real-estate dropdowns.
-- [x] Add service detail pages with specifications and geographic links, editable by admin.
-- [x] Add general contact requests and full navigation labels.
-- [x] Verify service browsing and service/general request submission on desktop and mobile.
-- [ ] Verify admin save end-to-end: blocked because no auth account exists; owner must create/sign in to an account.
-- [x] Stabilize lazy-route dependency prebundling; fresh loads, repeated client navigation, property dropdown, detail and request dialog verified without runtime errors.
-- [x] Add a distinct demo photograph for every existing service.
-- [x] Place specifications below the title, restrict location to properties, and close mobile navigation on outside clicks.
-- [x] Verify all 12 images, detail order, property links and mobile menu dismissal; 16 tests pass.
-- [ ] Replace property browsing with city, type, purpose and price/newest sort dropdowns; verify combined filtering.
-- [ ] Explain how to return to the project's GitHub settings.
+# Roadmap
+
+## Done
+- Property filters: city, type, purpose, sort (four dropdowns) on the real-estate page.
+- No "تفاصيل الخدمة" button on cards; the whole card opens the service page.
+- Comprehensive admin dashboard: overview, services CRUD, requests, site settings.
+- Every public text and image editable from Settings (site_content table).
+- Phone-number sign-in for the owner account; first account is admin.
+
+## Open
+- Owner to replace demo contact details (email, address, opening hours) from Settings.
+- Real map links for each property listing (needs the owner's actual URLs).
+- GitHub connection: settings → Git in the project.

@@ -1,39 +1,42 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
-
-const links = [
-  { to: "/", label: "الرئيسية" },
-  { to: "/general", label: "الخدمات العامة" },
-  { to: "/real-estate", label: "الخدمات العقارية" },
-  { to: "/students", label: "الخدمات الطلابية" },
-  { to: "/contact", label: "تواصل معنا" },
-] as const;
+import { useSiteContent } from "@/lib/site-content";
 
 export function SiteHeader() {
+  const content = useSiteContent();
   const [open, setOpen] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const links = [
+    { to: "/", label: content["nav.home"] },
+    { to: "/general", label: content["section.general.label"] },
+    { to: "/real-estate", label: content["section.real_estate.label"] },
+    { to: "/students", label: content["section.student.label"] },
+    { to: "/contact", label: content["nav.contact"] },
+  ] as const;
+
   useEffect(() => {
     if (!open) return;
-    const dismiss = (event: PointerEvent) => {
-      if (event.target instanceof Node && !headerRef.current?.contains(event.target)) setOpen(false);
+    const close = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setOpen(false);
     };
     const escape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
-    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("pointerdown", close);
     document.addEventListener("keydown", escape);
     return () => {
-      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("pointerdown", close);
       document.removeEventListener("keydown", escape);
     };
   }, [open]);
+
   return (
-    <header ref={headerRef} className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
+    <header ref={navRef} className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
+        <Link to="/" aria-label={content["site.name"]} onClick={() => setOpen(false)}>
           <Logo />
         </Link>
         <nav className="hidden items-center gap-1 lg:flex">
@@ -48,7 +51,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-         <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="القائمة" aria-expanded={open}>
+        <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="القائمة" aria-expanded={open}>
           {open ? <X /> : <Menu />}
         </Button>
       </div>
