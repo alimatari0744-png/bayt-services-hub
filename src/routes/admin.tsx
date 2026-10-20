@@ -103,8 +103,8 @@ function Dashboard() {
   const list = services.filter((s) => s.section === section);
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-10 lg:flex-row">
-      <aside className="lg:w-60 lg:shrink-0">
+    <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 lg:flex-row lg:py-10">
+      <aside className="hidden lg:block lg:w-60 lg:shrink-0">
         <div className="rounded-2xl border border-border bg-card p-4">
           <h1 className="text-lg font-bold">{content["admin.title"]}</h1>
           <p className="mt-1 text-xs text-muted-foreground">{content["site.name"]}</p>
