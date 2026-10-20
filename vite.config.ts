@@ -24,6 +24,7 @@ export default defineConfig({
         "@radix-ui/react-switch",
         "@radix-ui/react-tabs",
         "lucide-react",
+        "leaflet",
         "sonner",
         "class-variance-authority",
         "clsx",

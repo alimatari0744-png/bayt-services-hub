@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowRight, Clock, MapPin, PencilRuler, Phone } from "lucide-react";
+import { ArrowRight, MapPin, PencilRuler, Phone } from "lucide-react";
 import { SECTIONS, useImageUrl, type Service } from "@/lib/services";
 import { sectionText, useSiteContent } from "@/lib/site-content";
 import { RequestForm } from "@/components/site/RequestForm";
@@ -65,6 +65,14 @@ function ServiceDetail() {
         )}
       </div>
 
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-b border-border pb-5">
+        <div><p className="text-sm text-muted-foreground">{content["service.price_label"]}</p><p className="mt-1 font-display text-2xl font-bold text-primary">{service.price || content["service.price_fallback"]}</p></div>
+        <div className="flex flex-wrap gap-2">
+          {map && <Button asChild variant="outline"><a href={map} target="_blank" rel="noopener noreferrer"><MapPin className="h-4 w-4" />{content["service.map_label"]}</a></Button>}
+          {service.contact_phone && <Button asChild variant="ghost"><a href={`tel:${service.contact_phone}`}><Phone className="h-4 w-4" />{content["service.call_label"]}</a></Button>}
+        </div>
+      </div>
+
       <section className="mt-6 rounded-3xl border border-border bg-card p-6 md:p-8" aria-labelledby="service-specifications">
         <h2 id="service-specifications" className="flex items-center gap-2 text-xl font-bold"><PencilRuler className="h-5 w-5 text-primary" /> {content["service.specifications_title"]}</h2>
         {(specifications.text.trim() || !specifications.paragraphs.length) && <p className="mt-4 whitespace-pre-wrap break-words leading-8">{specifications.text || content["service.spec_fallback"]}</p>}
@@ -74,12 +82,6 @@ function ServiceDetail() {
             <dd className="min-w-0 whitespace-pre-wrap break-words leading-8 text-muted-foreground">{paragraph.content}</dd>
           </div>)}
         </dl>}
-      </section>
-
-      <section className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-secondary p-5">
-        <span className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-2 font-semibold text-primary"><Clock className="h-4 w-4" /> {content["service.price_label"]}: {service.price || content["service.price_fallback"]}</span>
-        {map && <Button asChild variant="outline"><a href={map} target="_blank" rel="noopener noreferrer"><MapPin className="h-4 w-4" />{content["service.map_label"]}</a></Button>}
-        {service.contact_phone && <span className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-2"><Phone className="h-4 w-4 text-primary" /> {content["service.call_label"]}: <a href={`tel:${service.contact_phone}`} dir="ltr" className="hover:text-primary">{service.contact_phone}</a></span>}
       </section>
 
       <div className="mt-8 rounded-3xl border border-border bg-card p-6 md:p-8">

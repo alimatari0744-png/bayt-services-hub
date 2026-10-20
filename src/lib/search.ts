@@ -1,4 +1,5 @@
 // Smart Arabic search: normalizes letters, tolerates typos, matches partial hints.
+import { ENGLISH_SEARCH_HINTS } from "./search-aliases";
 
 export function normalizeArabic(input: string): string {
   return (input || "")
@@ -25,11 +26,11 @@ function levenshtein(a: string, b: string): number {
   for (let i = 1; i <= m; i++) {
     const cur = [i];
     for (let j = 1; j <= n; j++) {
-      cur[j] = Math.min(prev[j]! + 1, cur[j - 1]! + 1, prev[j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1));
+      cur[j] = Math.min((prev[j] ?? 0) + 1, (cur[j - 1] ?? 0) + 1, (prev[j - 1] ?? 0) + (a[i - 1] === b[j - 1] ? 0 : 1));
     }
     prev = cur;
   }
-  return prev[n]!;
+  return prev[n] ?? 0;
 }
 
 function tokenScore(q: string, word: string): number {
@@ -65,10 +66,15 @@ export function scoreItem(query: string, item: Searchable): number {
   const qTokens = q.split(" ").filter(Boolean);
   let total = 0;
   for (const qt of qTokens) {
+    const aliases = (ENGLISH_SEARCH_HINTS[qt] ?? []).map(normalizeArabic);
     let best = 0;
     for (const [text, weight] of fields) {
       for (const w of normalizeArabic(text).split(" ")) {
         best = Math.max(best, tokenScore(qt, w) * weight);
+        // Aliases match exact concepts and their Arabic prefixes, not fuzzy unrelated words.
+        for (const alias of aliases) {
+          if (w === alias || w === `ل${alias}` || w === `لل${alias}`) best = Math.max(best, 10 * weight);
+        }
       }
     }
     if (best === 0) return 0; // every hint must match something
