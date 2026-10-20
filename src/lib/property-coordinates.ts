@@ -16,7 +16,7 @@ export function coordinatesFromMapUrl(value: string | null | undefined): Coordin
   try {
     const url = new URL(value);
     const pair = (url.searchParams.get("query") ?? url.searchParams.get("q"))?.split(",");
-    return pair?.length === 2 ? parseCoordinates(pair[0], pair[1]) : null;
+    return pair?.length === 2 ? parseCoordinates(pair[0] ?? "", pair[1] ?? "") : null;
   } catch { return null; }
 }
 

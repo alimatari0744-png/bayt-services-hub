@@ -8,7 +8,7 @@ describe("property geographic coordinates", () => {
     expect(coordinatesFromMapUrl(coordinateMapUrl(point))).toEqual(point);
   });
   it("rejects missing or out-of-range coordinates", () => {
-    for (const pair of [["", "46"], ["24", ""], ["91", "46"], ["24", "181"], ["abc", "46"]]) expect(parseCoordinates(pair[0], pair[1])).toBeNull();
+    for (const [latitude, longitude] of [["", "46"], ["24", ""], ["91", "46"], ["24", "181"], ["abc", "46"]] as [string, string][]) expect(parseCoordinates(latitude, longitude)).toBeNull();
     expect(parseCoordinates("0", "0")).toEqual({ latitude: 0, longitude: 0 });
   });
   it.each(["general", "student"])("removes location fields for %s services", (section) => {
