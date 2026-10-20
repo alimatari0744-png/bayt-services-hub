@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/lib/site-content";
+import { supabase } from "@/integrations/supabase/client";
 
 const ADMIN_TABS = [
   { tab: "overview", label: "نظرة عامة" },
@@ -64,6 +65,13 @@ export function SiteHeader() {
         <Link to="/" onClick={() => setOpen(false)} className={mobile ? "rounded-lg px-3 py-2 text-primary hover:bg-secondary" : linkCls}>
           العودة للموقع
         </Link>
+        <button
+          type="button"
+          onClick={() => { setOpen(false); supabase.auth.signOut(); }}
+          className={mobile ? "rounded-lg px-3 py-2 text-start text-destructive hover:bg-secondary" : linkCls}
+        >
+          خروج
+        </button>
       </>
     ) : (
       links.map((l) => (
