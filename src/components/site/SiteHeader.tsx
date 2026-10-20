@@ -88,18 +88,32 @@ export function SiteHeader() {
       ))
     );
 
+  // On /admin the sidebar (aside) already carries the tabs from lg and up,
+  // so the header shows only the logo there: no top nav row, no menu button.
+  const adminHasSidebar = isAdmin; // lg+
   return (
     <header ref={navRef} className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3">
         <Link to="/" aria-label={content["site.name"]} onClick={() => setOpen(false)}>
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-1 xl:flex">{renderLinks(false)}</nav>
-        <Button variant="ghost" size="icon" className="xl:hidden" onClick={() => setOpen(!open)} aria-label="القائمة" aria-expanded={open}>
+        <nav className={adminHasSidebar ? "hidden" : "hidden items-center gap-1 xl:flex"}>{renderLinks(false)}</nav>
+        <Button
+          variant="ghost"
+          size="icon"
+          className={adminHasSidebar ? "lg:hidden" : "xl:hidden"}
+          onClick={() => setOpen(!open)}
+          aria-label="القائمة"
+          aria-expanded={open}
+        >
           {open ? <X /> : <Menu />}
         </Button>
       </div>
-      {open && <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 xl:hidden">{renderLinks(true)}</nav>}
+      {open && (
+        <nav className={`flex flex-col gap-1 border-t border-border px-4 py-3 ${adminHasSidebar ? "lg:hidden" : "xl:hidden"}`}>
+          {renderLinks(true)}
+        </nav>
+      )}
     </header>
   );
 }
