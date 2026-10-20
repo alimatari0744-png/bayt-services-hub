@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SectionPage } from "@/components/site/SectionPage";
 import { servicesQuery } from "@/lib/services";
+import { classificationsQuery } from "@/lib/property-classifications";
 
 export const Route = createFileRoute("/real-estate")({
   head: () => ({
@@ -13,6 +14,6 @@ export const Route = createFileRoute("/real-estate")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(servicesQuery("real_estate")),
+  loader: ({ context }) => Promise.all([context.queryClient.ensureQueryData(servicesQuery("real_estate")), context.queryClient.ensureQueryData(classificationsQuery)]),
   component: () => <SectionPage section="real_estate" />,
 });

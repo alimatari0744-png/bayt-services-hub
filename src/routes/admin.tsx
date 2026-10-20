@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Boxes, Inbox, LayoutDashboard, LogOut, MessageCircle, Pencil, Plus, Settings, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,7 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { PROPERTY_CATEGORIES, geographicUrl } from "@/lib/service-filters";
+import { geographicUrl } from "@/lib/service-filters";
+import { CLASSIFICATION_GROUPS, classificationAssignmentsValid, classificationsQuery, resolvePropertyClassifications } from "@/lib/property-classifications";
+import { PROPERTY_SORTS, browseProperties, EMPTY_PROPERTY_FILTERS } from "@/lib/property-browsing";
+import { PropertyClassifications } from "@/components/admin/PropertyClassifications";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { contactLinks } from "@/lib/contact-links";
 import { parseServiceSpecifications, serializeServiceSpecifications, type SpecificationParagraph } from "@/lib/specification-paragraphs";
 
@@ -28,9 +33,9 @@ export const Route = createFileRoute("/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
-  validateSearch: (s: Record<string, unknown>): { tab?: "overview" | "services" | "requests" | "settings" } => {
+  validateSearch: (s: Record<string, unknown>): { tab?: "overview" | "services" | "requests" | "settings" | "classifications" } => {
     const t = s["tab"];
-    return t === "services" || t === "requests" || t === "settings" || t === "overview" ? { tab: t } : {};
+    return t === "services" || t === "requests" || t === "settings" || t === "overview" || t === "classifications" ? { tab: t } : {};
   },
   component: Admin,
 });
@@ -40,6 +45,7 @@ type Req = { id: string; name: string; phone: string; message: string; created_a
 const TABS = [
   { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
   { id: "services", label: "الخدمات", icon: Boxes },
+  { id: "classifications", label: "التصنيفات", icon: Boxes },
   { id: "requests", label: "الطلبات", icon: Inbox },
   { id: "settings", label: "إعدادات الموقع", icon: Settings },
 ] as const;
@@ -74,6 +80,7 @@ function Dashboard() {
   const [requests, setRequests] = useState<Req[]>([]);
   const [section, setSection] = useState<Section>("general");
   const [editing, setEditing] = useState<Partial<Service> | null>(null);
+  const [propertySort, setPropertySort] = useState("newest");
 
   async function load() {
     const [s, r] = await Promise.all([
@@ -102,7 +109,8 @@ function Dashboard() {
     load();
   }
 
-  const list = services.filter((s) => s.section === section);
+  const sectionList = services.filter((s) => s.section === section);
+  const list = section === "real_estate" ? browseProperties(sectionList, { ...EMPTY_PROPERTY_FILTERS, sort: propertySort }) : sectionList;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-8 px-4 py-6 lg:flex-row lg:py-10">
@@ -165,7 +173,7 @@ function Dashboard() {
         {tab === "services" && (
           <div className="space-y-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {(Object.keys(SECTIONS) as Section[]).map((k) => (
                   <button
                     key={k}
@@ -219,9 +227,10 @@ function Dashboard() {
         )}
 
         {tab === "settings" && <ContentSettings />}
+        {tab === "classifications" && <PropertyClassifications />}
       </main>
 
-      <ServiceForm value={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />
+      <ServiceForm value={editing} propertySort={propertySort} onPropertySort={setPropertySort} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); load(); }} />
     </div>
   );
 }
@@ -247,18 +256,26 @@ function ServiceRow({ service, onEdit, onDelete }: { service: Service; onEdit: (
   );
 }
 
-function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | null; onClose: () => void; onSaved: () => void }) {
+function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: { value: Partial<Service> | null; onClose: () => void; onSaved: () => void; propertySort: string; onPropertySort: (value: string) => void }) {
   const [form, setForm] = useState<Partial<Service>>({});
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [paragraphs, setParagraphs] = useState<SpecificationParagraph[]>([]);
+  const { data: classifications = [], isPending: classificationsLoading } = useQuery(classificationsQuery);
+  const queryClient = useQueryClient();
   const current = useImageUrl(form.image_url);
   useEffect(() => {
     const structured = parseServiceSpecifications(value?.specifications);
-    setForm({ ...value, specifications: structured.text });
+    const assignments: Partial<Service> = {};
+    if (value?.id && value.section === "real_estate" && value.title != null && value.category != null && value.subcategory != null && value.created_at != null) {
+      const resolved = resolvePropertyClassifications({ ...value, id: value.id, title: value.title, category: value.category, subcategory: value.subcategory, location: value.location ?? null, price: value.price ?? null, created_at: value.created_at }, classifications);
+      const legacy = {city: resolved.city, type: resolved.property_type, purpose: resolved.purpose};
+      for (const {kind,field} of CLASSIFICATION_GROUPS) assignments[field] = value[field] ?? classifications.find((option) => option.kind === kind && option.label === legacy[kind])?.id ?? null;
+    }
+    setForm({ ...value, ...assignments, specifications: structured.text });
     setParagraphs(structured.paragraphs);
     setFile(null);
-  }, [value]);
+  }, [value, classifications]);
 
   const set = (k: keyof Service, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
   const sec = (form.section ?? "general") as Section;
@@ -266,7 +283,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
   async function save() {
     if (!form.title?.trim()) { toast.error("العنوان مطلوب"); return; }
     if (paragraphs.some((paragraph) => !paragraph.title.trim() || !paragraph.content.trim())) { toast.error("أدخل عنوان ومحتوى كل فقرة"); return; }
-    if (sec === "real_estate" && !PROPERTY_CATEGORIES.some((c) => c === form.category)) { toast.error("اختر أحد التصنيفات العقارية الأربعة"); return; }
+    if (sec === "real_estate" && !classificationAssignmentsValid(form, classifications)) { toast.error("اختر المدينة والنوع والغرض من التصنيفات"); return; }
     if (sec === "real_estate" && form.map_url?.trim() && !geographicUrl(form.map_url.trim(), null)) { toast.error("أدخل رابط موقع صحيحاً يبدأ بـ https://"); return; }
     setSaving(true);
     let image_url = form.image_url ?? null;
@@ -280,6 +297,9 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
       section: sec,
       category: sec === "real_estate" ? form.category ?? "" : "",
       subcategory: sec === "real_estate" ? form.subcategory?.trim() ?? "" : "",
+      city_id: sec === "real_estate" ? form.city_id ?? null : null,
+      property_type_id: sec === "real_estate" ? form.property_type_id ?? null : null,
+      purpose_id: sec === "real_estate" ? form.purpose_id ?? null : null,
       specifications: serializeServiceSpecifications({ text: form.specifications ?? "", paragraphs }),
       map_url: sec === "real_estate" ? form.map_url?.trim() || null : null,
       title: form.title.trim(),
@@ -297,6 +317,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
     setSaving(false);
     if (error) { toast.error("تعذّر الحفظ"); return; }
     toast.success("تم الحفظ");
+    await queryClient.invalidateQueries({ queryKey: ["services"] });
     onSaved();
   }
 
@@ -308,17 +329,21 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
         </DialogHeader>
         <div className="space-y-3">
           <Input placeholder="عنوان الخدمة" value={form.title ?? ""} onChange={(e) => set("title", e.target.value)} />
-          {sec === "real_estate" && <div>
-            <p className="mb-2 text-sm text-muted-foreground">التصنيف</p>
-            <div className="flex flex-wrap gap-2">
-              {PROPERTY_CATEGORIES.map((c) => (
-                <Button key={c} type="button" size="sm" variant={form.category === c ? "default" : "secondary"} onClick={() => { set("category", c); set("subcategory", ""); }}>
-                  {c}
-                </Button>
-              ))}
+          {sec === "real_estate" && <div className="grid grid-cols-2 gap-3">
+            {CLASSIFICATION_GROUPS.map(({kind,field,label}) => <div key={kind} className="min-w-0 space-y-2">
+              <label id={`label-${field}`} className="block text-sm">{label}</label>
+              <Select dir="rtl" value={form[field] ?? ""} onValueChange={(id) => set(field,id)} disabled={classificationsLoading}>
+                <SelectTrigger aria-labelledby={`label-${field}`} className="w-full"><SelectValue placeholder={`اختر ${label}`} /></SelectTrigger>
+                <SelectContent>{classifications.filter((option) => option.kind === kind).map((option) => <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>)}
+            <div className="min-w-0 space-y-2">
+              <label id="property-sort-label" className="block text-sm">الترتيب</label>
+              <Select dir="rtl" value={propertySort} onValueChange={onPropertySort}>
+                <SelectTrigger aria-labelledby="property-sort-label" className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>{PROPERTY_SORTS.map((sort) => <SelectItem key={sort.value} value={sort.value}>{sort.label}</SelectItem>)}</SelectContent>
+              </Select>
             </div>
-            <label className="mb-2 mt-3 block text-sm" htmlFor="subcategory">التصنيف الفرعي</label>
-            <Input id="subcategory" placeholder="التصنيف الفرعي" maxLength={100} value={form.subcategory ?? ""} onChange={(e) => set("subcategory", e.target.value)} />
           </div>}
           <Textarea placeholder="الوصف" value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} />
           <div className="space-y-3 border-y border-border py-4">

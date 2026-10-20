@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      property_classifications: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          label: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          label: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          label?: string
+        }
+        Relationships: []
+      }
       requests: {
         Row: {
           created_at: string
@@ -52,6 +73,7 @@ export type Database = {
       services: {
         Row: {
           category: string
+          city_id: string | null
           contact_phone: string | null
           created_at: string
           description: string
@@ -62,6 +84,8 @@ export type Database = {
           location: string | null
           map_url: string | null
           price: string | null
+          property_type_id: string | null
+          purpose_id: string | null
           section: Database["public"]["Enums"]["service_section"]
           specifications: string
           subcategory: string
@@ -69,6 +93,7 @@ export type Database = {
         }
         Insert: {
           category?: string
+          city_id?: string | null
           contact_phone?: string | null
           created_at?: string
           description?: string
@@ -79,6 +104,8 @@ export type Database = {
           location?: string | null
           map_url?: string | null
           price?: string | null
+          property_type_id?: string | null
+          purpose_id?: string | null
           section: Database["public"]["Enums"]["service_section"]
           specifications?: string
           subcategory?: string
@@ -86,6 +113,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          city_id?: string | null
           contact_phone?: string | null
           created_at?: string
           description?: string
@@ -96,12 +124,36 @@ export type Database = {
           location?: string | null
           map_url?: string | null
           price?: string | null
+          property_type_id?: string | null
+          purpose_id?: string | null
           section?: Database["public"]["Enums"]["service_section"]
           specifications?: string
           subcategory?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "services_city_id_fkey"
+            columns: ["city_id"]
+            isOneToOne: false
+            referencedRelation: "property_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_property_type_id_fkey"
+            columns: ["property_type_id"]
+            isOneToOne: false
+            referencedRelation: "property_classifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_purpose_id_fkey"
+            columns: ["purpose_id"]
+            isOneToOne: false
+            referencedRelation: "property_classifications"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       site_content: {
         Row: {

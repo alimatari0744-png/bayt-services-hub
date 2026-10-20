@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 const ADMIN_TABS = [
   { tab: "overview", label: "نظرة عامة" },
   { tab: "services", label: "الخدمات" },
+  { tab: "classifications", label: "التصنيفات" },
   { tab: "requests", label: "الطلبات" },
   { tab: "settings", label: "إعدادات الموقع" },
 ] as const;
@@ -93,12 +94,12 @@ export function SiteHeader() {
         <Link to="/" aria-label={content["site.name"]} onClick={() => setOpen(false)}>
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-1 lg:flex">{renderLinks(false)}</nav>
-        <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="القائمة" aria-expanded={open}>
+        <nav className="hidden items-center gap-1 xl:flex">{renderLinks(false)}</nav>
+        <Button variant="ghost" size="icon" className="xl:hidden" onClick={() => setOpen(!open)} aria-label="القائمة" aria-expanded={open}>
           {open ? <X /> : <Menu />}
         </Button>
       </div>
-      {open && <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 lg:hidden">{renderLinks(true)}</nav>}
+      {open && <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 xl:hidden">{renderLinks(true)}</nav>}
     </header>
   );
 }
