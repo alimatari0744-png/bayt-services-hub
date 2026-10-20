@@ -43,12 +43,12 @@ export function ContentSettings() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {CONTENT_GROUPS.map((g) => (
           <button
             key={g.id}
             onClick={() => setGroup(g.id)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${group === g.id ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-secondary/70"}`}
+            className={`min-w-0 rounded-xl px-3 py-2.5 text-center text-sm font-medium leading-tight transition sm:rounded-full sm:px-4 sm:py-2 ${group === g.id ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-secondary/70"}`}
           >
             {g.label}
           </button>
