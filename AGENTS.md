@@ -23,3 +23,4 @@
 - Admin sign-in is by phone number: `src/lib/phone-auth.ts` maps a Saudi number to one synthetic email, so auth stays email-based without a lookup table; admin rights always come from `public.user_roles` through `has_role`, never from browser state.
 - All service specifications use the shared helper to serialize free text and title/content paragraphs in the existing specifications text column; parse legacy plain text and paragraph arrays without losing owner content.
 - Generate call and WhatsApp destinations through the shared contact-links helper using recorded numbers, preserving explicit international codes and omitting invalid WhatsApp destinations.
+- PropertyLocationField edits validated coordinates stored as a Google Maps URL in the existing map_url column; new saves clear the legacy location text, while city classification IDs remain independent for filtering. Customer map actions use explicit map_url only, never inferred written addresses.

@@ -1,6 +1,14 @@
 export type SpecificationParagraph = { title: string; content: string };
 export type ServiceSpecifications = { text: string; paragraphs: SpecificationParagraph[] };
 
+export function specificationParagraphDrafts(value: string | null | undefined): SpecificationParagraph[] {
+  return [...parseServiceSpecifications(value).paragraphs.filter(({ title, content }) => title.trim() || content.trim()), { title: "", content: "" }];
+}
+
+export function incompleteSpecificationParagraphs(paragraphs: SpecificationParagraph[]): boolean {
+  return paragraphs.some(({ title, content }) => Boolean(title.trim() || content.trim()) && (!title.trim() || !content.trim()));
+}
+
 function isParagraphs(value: unknown): value is SpecificationParagraph[] {
   return Array.isArray(value) && value.every((item) => item && typeof item === "object" && typeof item.title === "string" && typeof item.content === "string");
 }
@@ -20,8 +28,9 @@ export function parseServiceSpecifications(value: string | null | undefined): Se
 }
 
 export function serializeServiceSpecifications(specifications: ServiceSpecifications): string {
-  if (!specifications.paragraphs.length) return specifications.text;
-  return JSON.stringify({ text: specifications.text, paragraphs: specifications.paragraphs.map(({ title, content }) => ({ title: title.trim(), content: content.trim() })) });
+  const paragraphs = specifications.paragraphs.filter(({ title, content }) => title.trim() || content.trim()).map(({ title, content }) => ({ title: title.trim(), content: content.trim() }));
+  if (!paragraphs.length) return specifications.text;
+  return JSON.stringify({ text: specifications.text, paragraphs });
 }
 
 export function parseSpecificationParagraphs(value: string | null | undefined): SpecificationParagraph[] | null {

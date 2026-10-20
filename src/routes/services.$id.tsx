@@ -4,6 +4,8 @@ import { SECTIONS, useImageUrl, type Service } from "@/lib/services";
 import { sectionText, useSiteContent } from "@/lib/site-content";
 import { RequestForm } from "@/components/site/RequestForm";
 import { parseServiceSpecifications } from "@/lib/specification-paragraphs";
+import { geographicUrl } from "@/lib/service-filters";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/services/$id")({
   head: ({ params }) => ({
@@ -38,6 +40,7 @@ function ServiceDetail() {
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
   const specifications = parseServiceSpecifications(service.specifications);
+  const map = service.section === "real_estate" ? geographicUrl(service.map_url, null) : null;
 
   return (
     <article className="mx-auto max-w-6xl px-4 py-10 md:py-14">
@@ -75,7 +78,7 @@ function ServiceDetail() {
 
       <section className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-secondary p-5">
         <span className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-2 font-semibold text-primary"><Clock className="h-4 w-4" /> {content["service.price_label"]}: {service.price || content["service.price_fallback"]}</span>
-        {service.location && <span className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-2"><MapPin className="h-4 w-4 text-primary" /> {content["service.location_label"]}: {service.location}</span>}
+        {map && <Button asChild variant="outline"><a href={map} target="_blank" rel="noopener noreferrer"><MapPin className="h-4 w-4" />{content["service.map_label"]}</a></Button>}
         {service.contact_phone && <span className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-2"><Phone className="h-4 w-4 text-primary" /> {content["service.call_label"]}: <a href={`tel:${service.contact_phone}`} dir="ltr" className="hover:text-primary">{service.contact_phone}</a></span>}
       </section>
 
