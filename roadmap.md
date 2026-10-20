@@ -1,5 +1,8 @@
 # Roadmap
 
+## In progress
+- Automatically show an optional blank specification paragraph; replace written service locations with a property-only coordinate window and customer Google Maps link.
+
 ## Done
 - Owner-managed city/type/purpose classifications shared by property editing and customer browsing; mobile navigation, creation, editing, assignment persistence, rename matching, restricted deletion and anonymous combined filtering verified.
 - All three service sections support free-text specifications followed by + added title/content paragraphs displayed side by side; saving, reopening, public display, and mobile layout verified through the admin UI.
