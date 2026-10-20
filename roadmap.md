@@ -1,9 +1,7 @@
 # Roadmap
 
-## Current
-- Apply free-text specifications followed by optional inline title/content paragraphs to all services; verify saving and public display.
-
 ## Done
+- All three service sections support free-text specifications followed by + added title/content paragraphs displayed side by side; saving, reopening, public display, and mobile layout verified through the admin UI.
 - Property specification title/content paragraphs with demo entries saved through the admin UI; refreshed RTL dropdowns; footer and request WhatsApp links and request call links verified.
 - Added throttled recovery for stale deployment page modules that previously blanked navigation.
 - Investigated login rejection (invalid credentials); removed public account-creation UI and distinguished connectivity errors.

@@ -13,7 +13,7 @@ describe("property specification paragraphs", () => {
 });
 
 describe("all service specifications", () => {
-  it.each(["general", "student", "real_estate"])("preserves free text and optional paragraphs for %s services", () => {
+  it("preserves free text followed by optional title/content paragraphs", () => {
     const specifications = { text: "تفاصيل الخدمة المكتوبة", paragraphs: [{ title: "نوع الأثاث", content: "أثاث مستورد عالي الجودة" }] };
     expect(parseServiceSpecifications(serializeServiceSpecifications(specifications))).toEqual(specifications);
   });
