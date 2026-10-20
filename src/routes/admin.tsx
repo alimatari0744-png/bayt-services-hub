@@ -27,7 +27,7 @@ export const Route = createFileRoute("/admin")({
     ],
   }),
   validateSearch: (s: Record<string, unknown>): { tab?: "overview" | "services" | "requests" | "settings" } => {
-    const t = s.tab;
+    const t = s["tab"];
     return t === "services" || t === "requests" || t === "settings" || t === "overview" ? { tab: t } : {};
   },
   component: Admin,
