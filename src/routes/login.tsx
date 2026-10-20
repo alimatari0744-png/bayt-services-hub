@@ -25,7 +25,6 @@ export const Route = createFileRoute("/login")({
 
 function Login() {
   const content = useSiteContent();
-  const [mode, setMode] = useState<"in" | "up">("in");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -36,21 +35,19 @@ function Login() {
     const password = String(fd.get("password"));
     if (!email) { toast.error(content["login.invalid"]); return; }
     setLoading(true);
-    if (mode === "in") {
+    try {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error(error.code === "invalid_credentials" || error.code === "invalid_login_credentials"
+          ? content["login.wrong"]
+          : content["login.unavailable"]);
+        return;
+      }
+      await navigate({ to: "/admin" });
+    } catch {
+      toast.error(content["login.unavailable"]);
+    } finally {
       setLoading(false);
-      if (error) { toast.error(content["login.wrong"]); return; }
-      navigate({ to: "/admin" });
-    } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { emailRedirectTo: `${window.location.origin}/admin` },
-      });
-      setLoading(false);
-      if (error) { toast.error(error.message); return; }
-      toast.success(content["login.created"]);
-      setMode("in");
     }
   }
 
@@ -58,17 +55,14 @@ function Login() {
     <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-16">
       <div className="w-full rounded-3xl border border-border bg-card p-8 shadow-lift">
         <Logo />
-        <h1 className="mt-6 text-2xl font-bold">{mode === "in" ? content["login.title_in"] : content["login.title_up"]}</h1>
+        <h1 className="mt-6 text-2xl font-bold">{content["login.title_in"]}</h1>
         <form onSubmit={submit} className="mt-6 space-y-3">
-          <Input name="identity" placeholder={content["login.identity_placeholder"]} required autoComplete="username" dir="ltr" />
-          <Input name="password" type="password" placeholder={content["login.password_placeholder"]} minLength={6} required dir="ltr" />
+          <Input name="identity" aria-label={content["login.identity_placeholder"]} placeholder={content["login.identity_placeholder"]} required autoComplete="username" dir="ltr" />
+          <Input name="password" aria-label={content["login.password_placeholder"]} type="password" autoComplete="current-password" placeholder={content["login.password_placeholder"]} required dir="ltr" />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "..." : mode === "in" ? content["login.submit_in"] : content["login.submit_up"]}
+            {loading ? "..." : content["login.submit_in"]}
           </Button>
         </form>
-        <button onClick={() => setMode(mode === "in" ? "up" : "in")} className="mt-4 text-sm text-primary hover:underline">
-          {mode === "in" ? content["login.switch_up"] : content["login.switch_in"]}
-        </button>
       </div>
     </div>
   );
