@@ -1,14 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { ChevronDown, LayoutGrid, Search, SlidersHorizontal } from "lucide-react";
+import { ArrowDownUp, Building2, ChevronDown, KeyRound, LayoutGrid, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { servicesQuery, type Section } from "@/lib/services";
 import { sectionText, useSiteContent } from "@/lib/site-content";
 import { smartSearch } from "@/lib/search";
 import { ServiceCard } from "./ServiceCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
   DEMO_CITIES,
   EMPTY_PROPERTY_FILTERS,
@@ -21,10 +21,10 @@ import {
 } from "@/lib/property-browsing";
 
 const FILTERS = [
-  { key: "city", label: PROPERTY_FILTER_LABELS[0], all: "كل المدن", reset: "", options: DEMO_CITIES.map((v) => ({ value: v, label: v })) },
-  { key: "type", label: PROPERTY_FILTER_LABELS[1], all: "كل الأنواع", reset: "", options: PROPERTY_TYPES.map((v) => ({ value: v, label: v })) },
-  { key: "purpose", label: PROPERTY_FILTER_LABELS[2], all: "كل الأغراض", reset: "", options: PROPERTY_PURPOSES.map((v) => ({ value: v, label: v })) },
-  { key: "sort", label: PROPERTY_FILTER_LABELS[3], all: "الأحدث", reset: "newest", options: PROPERTY_SORTS.map((s) => ({ value: s.value, label: s.label })) },
+  { key: "city", icon: MapPin, label: PROPERTY_FILTER_LABELS[0], all: "كل المدن", reset: "", options: DEMO_CITIES.map((v) => ({ value: v, label: v })) },
+  { key: "type", icon: Building2, label: PROPERTY_FILTER_LABELS[1], all: "كل الأنواع", reset: "", options: PROPERTY_TYPES.map((v) => ({ value: v, label: v })) },
+  { key: "purpose", icon: KeyRound, label: PROPERTY_FILTER_LABELS[2], all: "كل الأغراض", reset: "", options: PROPERTY_PURPOSES.map((v) => ({ value: v, label: v })) },
+  { key: "sort", icon: ArrowDownUp, label: PROPERTY_FILTER_LABELS[3], all: "الأحدث", reset: "newest", options: PROPERTY_SORTS.map((s) => ({ value: s.value, label: s.label })) },
 ] as const;
 
 export function SectionPage({ section }: { section: Section }) {
@@ -69,31 +69,32 @@ export function SectionPage({ section }: { section: Section }) {
         {section === "real_estate" && (
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {FILTERS.map((dropdown) => (
-              <DropdownMenu key={dropdown.key}>
+              <DropdownMenu key={dropdown.key} dir="rtl">
                 <DropdownMenuTrigger asChild>
                   <Button
                     aria-label={dropdown.label}
-                    variant={filters[dropdown.key] && dropdown.key !== "sort" ? "default" : "secondary"}
-                    className="h-auto min-h-12 w-full justify-between gap-2 px-3 py-2"
+                    variant="outline"
+                    className={`h-16 w-full justify-between gap-3 rounded-lg px-4 text-foreground shadow-none transition hover:border-primary/50 hover:bg-primary/5 data-[state=open]:border-primary data-[state=open]:ring-1 data-[state=open]:ring-primary/20 ${filters[dropdown.key] !== dropdown.reset ? "border-primary/50 bg-primary/5" : "bg-background"}`}
                   >
-                    <span className="pointer-events-none min-w-0 text-right">
-                      <span className="block text-xs opacity-75">{dropdown.label}</span>
-                      <span className="block whitespace-normal">
+                    <dropdown.icon className="text-primary" />
+                    <span className="pointer-events-none min-w-0 flex-1 text-right">
+                      <span className="block text-xs font-normal text-muted-foreground">{dropdown.label}</span>
+                      <span className="mt-1 block truncate text-sm font-semibold">
                         {dropdown.options.find((option) => option.value === filters[dropdown.key])?.label || dropdown.all}
                       </span>
                     </span>
-                    <ChevronDown className="pointer-events-none h-4 w-4 shrink-0" />
+                    <ChevronDown className="pointer-events-none h-4 w-4 shrink-0 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="max-h-72 w-56 overflow-y-auto">
-                  <DropdownMenuItem onSelect={() => setFilters((current) => ({ ...current, [dropdown.key]: dropdown.reset }))}>
-                    {dropdown.all}
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="start" sideOffset={8} className="max-h-72 w-[var(--radix-dropdown-menu-trigger-width)] min-w-44 overflow-y-auto rounded-lg border-border p-1.5 shadow-soft">
+                  <DropdownMenuRadioGroup value={filters[dropdown.key]} onValueChange={(value) => setFilters((current) => ({ ...current, [dropdown.key]: value }))}>
+                  {dropdown.key !== "sort" && <DropdownMenuRadioItem value={dropdown.reset} className="min-h-10 cursor-pointer rounded-md data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary">{dropdown.all}</DropdownMenuRadioItem>}
                   {dropdown.options.map((option) => (
-                    <DropdownMenuItem key={option.value} onSelect={() => setFilters((current) => ({ ...current, [dropdown.key]: option.value }))}>
+                    <DropdownMenuRadioItem key={option.value} value={option.value} className="min-h-10 cursor-pointer rounded-md data-[state=checked]:bg-primary/10 data-[state=checked]:text-primary">
                       {option.label}
-                    </DropdownMenuItem>
+                    </DropdownMenuRadioItem>
                   ))}
+                  </DropdownMenuRadioGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             ))}

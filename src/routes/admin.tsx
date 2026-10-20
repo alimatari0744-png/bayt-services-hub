@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Boxes, Inbox, LayoutDashboard, LogOut, Pencil, Plus, Settings, Trash2 } from "lucide-react";
+import { Boxes, Inbox, LayoutDashboard, LogOut, MessageCircle, Pencil, Plus, Settings, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { SECTIONS, useImageUrl, type Section, type Service } from "@/lib/services";
@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PROPERTY_CATEGORIES, geographicUrl } from "@/lib/service-filters";
+import { contactLinks } from "@/lib/contact-links";
+import { parseSpecificationParagraphs, serializeSpecificationParagraphs, type SpecificationParagraph } from "@/lib/specification-paragraphs";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -200,8 +202,13 @@ function Dashboard() {
                     </span>
                   </div>
                   <p className="text-sm">الخدمة: <span className="font-medium">{r.services?.title ?? "طلب خدمة غير مسجلة"}</span></p>
-                  <p className="text-sm">الجوال: <a href={`tel:${r.phone}`} className="text-primary" dir="ltr">{r.phone}</a>
-                    {" · "}<a href={`https://wa.me/${r.phone.replace(/\D/g, "").replace(/^0/, "966")}`} target="_blank" rel="noreferrer" className="text-primary">واتساب</a></p>
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span>الجوال:</span>
+                    <a href={contactLinks(r.phone).call} className="text-primary hover:underline" dir="ltr">{r.phone}</a>
+                    {contactLinks(r.phone).whatsapp && <Button asChild size="icon" variant="ghost" className="text-primary">
+                      <a href={contactLinks(r.phone).whatsapp ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={`واتساب ${r.name}`} title={`واتساب ${r.name}`}><MessageCircle className="h-4 w-4" /></a>
+                    </Button>}
+                  </div>
                   <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString("ar-SA")}</p>
                   <p className="whitespace-pre-wrap break-words rounded-lg bg-muted/50 p-2 text-sm">{r.message || "بدون رسالة"}</p>
                 </div>
@@ -244,9 +251,12 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
   const [form, setForm] = useState<Partial<Service>>({});
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
+  const [paragraphs, setParagraphs] = useState<SpecificationParagraph[]>([]);
   const current = useImageUrl(form.image_url);
   useEffect(() => {
     setForm(value ?? {});
+    const structured = parseSpecificationParagraphs(value?.specifications);
+    setParagraphs(structured ?? (value?.specifications?.trim() ? [{ title: "مواصفات الخدمة", content: value.specifications }] : []));
     setFile(null);
   }, [value]);
 
@@ -255,6 +265,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
 
   async function save() {
     if (!form.title?.trim()) { toast.error("العنوان مطلوب"); return; }
+    if (sec === "real_estate" && paragraphs.some((paragraph) => !paragraph.title.trim() || !paragraph.content.trim())) { toast.error("أدخل عنوان ومحتوى كل فقرة"); return; }
     if (sec === "real_estate" && !PROPERTY_CATEGORIES.some((c) => c === form.category)) { toast.error("اختر أحد التصنيفات العقارية الأربعة"); return; }
     if (sec === "real_estate" && form.map_url?.trim() && !geographicUrl(form.map_url.trim(), null)) { toast.error("أدخل رابط موقع صحيحاً يبدأ بـ https://"); return; }
     setSaving(true);
@@ -269,7 +280,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
       section: sec,
       category: sec === "real_estate" ? form.category ?? "" : "",
       subcategory: sec === "real_estate" ? form.subcategory?.trim() ?? "" : "",
-      specifications: form.specifications ?? "",
+      specifications: sec === "real_estate" ? serializeSpecificationParagraphs(paragraphs) : form.specifications ?? "",
       map_url: sec === "real_estate" ? form.map_url?.trim() || null : null,
       title: form.title.trim(),
       description: form.description ?? "",
@@ -310,8 +321,26 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
             <Input id="subcategory" placeholder="التصنيف الفرعي" maxLength={100} value={form.subcategory ?? ""} onChange={(e) => set("subcategory", e.target.value)} />
           </div>}
           <Textarea placeholder="الوصف" value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} />
-          <label className="block text-sm" htmlFor="specifications">مواصفات الخدمة وتفاصيلها</label>
-          <Textarea id="specifications" rows={5} value={form.specifications ?? ""} onChange={(e) => set("specifications", e.target.value)} />
+          {sec === "real_estate" ? <div className="space-y-3 border-y border-border py-4">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-semibold">فقرات مواصفات الخدمة</h3>
+              <Button type="button" size="sm" variant="outline" onClick={() => setParagraphs((current) => [...current, { title: "", content: "" }])}><Plus /> إضافة فقرة</Button>
+            </div>
+            {paragraphs.map((paragraph, index) => <div key={index} className="space-y-2 border-b border-border pb-3 last:border-0 last:pb-0">
+              <div className="flex items-end gap-2">
+                <div className="min-w-0 flex-1">
+                  <label htmlFor={`paragraph-title-${index}`} className="mb-1 block text-sm">عنوان الفقرة {index + 1}</label>
+                  <Input id={`paragraph-title-${index}`} value={paragraph.title} onChange={(event) => setParagraphs((current) => current.map((item, i) => i === index ? { ...item, title: event.target.value } : item))} />
+                </div>
+                <Button type="button" size="icon" variant="ghost" aria-label={`حذف الفقرة ${index + 1}`} title="حذف الفقرة" onClick={() => setParagraphs((current) => current.filter((_, i) => i !== index))}><Trash2 className="text-destructive" /></Button>
+              </div>
+              <label htmlFor={`paragraph-content-${index}`} className="block text-sm">محتوى الفقرة {index + 1}</label>
+              <Textarea id={`paragraph-content-${index}`} rows={3} value={paragraph.content} onChange={(event) => setParagraphs((current) => current.map((item, i) => i === index ? { ...item, content: event.target.value } : item))} />
+            </div>)}
+          </div> : <>
+            <label className="block text-sm" htmlFor="specifications">مواصفات الخدمة وتفاصيلها</label>
+            <Textarea id="specifications" rows={5} value={form.specifications ?? ""} onChange={(e) => set("specifications", e.target.value)} />
+          </>}
           <div className="grid grid-cols-2 gap-3">
             <Input placeholder="السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} />
             <Input placeholder="الموقع" value={form.location ?? ""} onChange={(e) => set("location", e.target.value)} />

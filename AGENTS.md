@@ -21,3 +21,5 @@
 
 - All public-site wording and images are editable rows in `public.site_content` (key/jsonb value, public read + admin-only write via `has_role`); components read defaults from `src/lib/site-content.ts` and must never hardcode copy that the owner should control.
 - Admin sign-in is by phone number: `src/lib/phone-auth.ts` maps a Saudi number to one synthetic email, so auth stays email-based without a lookup table; admin rights always come from `public.user_roles` through `has_role`, never from browser state.
+- Property specification paragraphs are serialized title/content arrays in the existing specifications text column, parsed through the shared helper; legacy plain text stays readable and is preserved when edited.
+- Generate call and WhatsApp destinations through the shared contact-links helper using recorded numbers, preserving explicit international codes and omitting invalid WhatsApp destinations.
