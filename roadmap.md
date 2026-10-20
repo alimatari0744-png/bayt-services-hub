@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Added throttled recovery for stale deployment page modules that previously blanked navigation.
 - Investigated login rejection (invalid credentials); removed public account-creation UI and distinguished connectivity errors.
 - Property filters: city, type, purpose, sort (four dropdowns) on the real-estate page.
 - No "تفاصيل الخدمة" button on cards; the whole card opens the service page.
