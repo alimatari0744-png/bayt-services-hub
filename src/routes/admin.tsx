@@ -11,7 +11,6 @@ import { ContentSettings } from "@/components/admin/ContentSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { geographicUrl } from "@/lib/service-filters";
 import { PropertyLocationField } from "@/components/admin/PropertyLocationField";
@@ -366,19 +365,14 @@ function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: 
               <Textarea id={`paragraph-content-${index}`} rows={3} value={paragraph.content} onChange={(event) => setParagraphs((current) => current.map((item, i) => i === index ? { ...item, content: event.target.value } : item))} />
             </div>)}
           </div>
-          <Input placeholder="السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} />
+          <div className="space-y-2"><label htmlFor="service-price" className="block text-sm">السعر</label><Input id="service-price" placeholder="أدخل السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} /></div>
           {sec === "real_estate" && <PropertyLocationField value={form.map_url} onChange={(value) => set("map_url", value)} />}
-          <Input placeholder="كلمات مفتاحية للبحث (مفصولة بمسافة)" value={form.keywords ?? ""} onChange={(e) => set("keywords", e.target.value)} />
           <div>
             <p className="mb-2 text-sm text-muted-foreground">صورة الخدمة</p>
             {current && <span className="mb-2 block h-24 w-40 overflow-hidden rounded-lg border border-border"><img src={current} alt="" className="h-full w-full object-cover" /></span>}
             <Input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
             {file && <p className="mt-1 text-xs text-primary">صورة جديدة: {file.name}</p>}
           </div>
-          <label className="flex items-center justify-between rounded-xl bg-muted p-3 text-sm">
-            ظاهرة للزوار
-            <Switch checked={form.is_active ?? true} onCheckedChange={(v) => set("is_active", v)} />
-          </label>
           <Button className="w-full" onClick={save} disabled={saving}>{saving ? "جارٍ الحفظ..." : "حفظ"}</Button>
         </div>
       </DialogContent>
