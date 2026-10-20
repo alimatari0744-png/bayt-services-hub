@@ -86,6 +86,7 @@ export const SITE_CONTENT_DEFAULTS = {
   "login.switch_in": "لديك حساب؟ سجّل الدخول",
   "login.invalid": "أدخل رقم جوال صحيحاً أو بريداً إلكترونياً",
   "login.wrong": "بيانات الدخول غير صحيحة",
+  "login.unavailable": "تعذّر تسجيل الدخول الآن، تحقق من الاتصال وحاول مجدداً",
   "login.created": "تم إنشاء الحساب",
 
   "footer.about": "نقدّم خدمات عامة وعقارية وطلابية بجودة وسرعة، لنوفّر وقتك وجهدك.",
@@ -221,16 +222,12 @@ export const CONTENT_GROUPS: ContentGroup[] = [
     description: "نصوص صفحة تسجيل الدخول.",
     fields: [
       { key: "login.title_in", label: "عنوان الدخول" },
-      { key: "login.title_up", label: "عنوان إنشاء الحساب" },
       { key: "login.identity_placeholder", label: "خانة رقم الجوال/البريد" },
       { key: "login.password_placeholder", label: "خانة كلمة المرور" },
       { key: "login.submit_in", label: "زر الدخول" },
-      { key: "login.submit_up", label: "زر إنشاء الحساب" },
-      { key: "login.switch_up", label: "رابط إنشاء حساب" },
-      { key: "login.switch_in", label: "رابط تسجيل الدخول" },
       { key: "login.invalid", label: "رسالة بيانات غير صحيحة" },
       { key: "login.wrong", label: "رسالة فشل الدخول" },
-      { key: "login.created", label: "رسالة إنشاء الحساب" },
+      { key: "login.unavailable", label: "رسالة تعذّر الاتصال" },
     ],
   },
 ];
