@@ -1,10 +1,34 @@
 export type SpecificationParagraph = { title: string; content: string };
+export type ServiceSpecifications = { text: string; paragraphs: SpecificationParagraph[] };
+
+function isParagraphs(value: unknown): value is SpecificationParagraph[] {
+  return Array.isArray(value) && value.every((item) => item && typeof item === "object" && typeof item.title === "string" && typeof item.content === "string");
+}
+
+export function parseServiceSpecifications(value: string | null | undefined): ServiceSpecifications {
+  if (!value?.trim()) return { text: "", paragraphs: [] };
+  try {
+    const parsed: unknown = JSON.parse(value);
+    if (isParagraphs(parsed)) return { text: "", paragraphs: parsed };
+    if (parsed && typeof parsed === "object" && "text" in parsed && typeof parsed.text === "string" && "paragraphs" in parsed && isParagraphs(parsed.paragraphs)) {
+      return { text: parsed.text, paragraphs: parsed.paragraphs };
+    }
+  } catch {
+    // Plain-text specifications from existing services are preserved verbatim.
+  }
+  return { text: value, paragraphs: [] };
+}
+
+export function serializeServiceSpecifications(specifications: ServiceSpecifications): string {
+  if (!specifications.paragraphs.length) return specifications.text;
+  return JSON.stringify({ text: specifications.text, paragraphs: specifications.paragraphs.map(({ title, content }) => ({ title: title.trim(), content: content.trim() })) });
+}
 
 export function parseSpecificationParagraphs(value: string | null | undefined): SpecificationParagraph[] | null {
   if (!value?.trim()) return null;
   try {
     const parsed: unknown = JSON.parse(value);
-    if (!Array.isArray(parsed) || !parsed.every((item) => item && typeof item === "object" && typeof item.title === "string" && typeof item.content === "string")) return null;
+    if (!isParagraphs(parsed)) return null;
     return parsed.map((item) => ({ title: item.title, content: item.content }));
   } catch {
     return null;
