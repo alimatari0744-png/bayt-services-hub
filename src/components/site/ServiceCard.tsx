@@ -1,7 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin } from "lucide-react";
 import { useImageUrl, type Service } from "@/lib/services";
-import { geographicUrl } from "@/lib/service-filters";
 import { useSiteContent } from "@/lib/site-content";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -10,7 +8,6 @@ import { RequestForm } from "./RequestForm";
 export function ServiceCard({ service, index = 0 }: { service: Service; index?: number }) {
   const img = useImageUrl(service.image_url);
   const content = useSiteContent();
-  const map = service.section === "real_estate" ? geographicUrl(service.map_url, null) : null;
 
   return (
     <article
@@ -38,17 +35,6 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
           <span className="font-display font-bold text-primary">{service.price || content["service.price_fallback"]}</span>
           <span className="relative z-20"><RequestDialog service={service} /></span>
         </div>
-        {map && (
-          <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
-            {map && (
-              <Button asChild variant="ghost" size="icon" className="relative z-20">
-                <a href={map} target="_blank" rel="noopener noreferrer" aria-label={content["service.map_label"]} title={content["service.map_label"]}>
-                  <MapPin className="h-4 w-4" />
-                </a>
-              </Button>
-            )}
-          </div>
-        )}
       </div>
     </article>
   );
