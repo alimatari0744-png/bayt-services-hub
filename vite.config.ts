@@ -7,6 +7,27 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  vite: {
+    optimizeDeps: {
+      // Prebundle lazy-route dependencies together. Discovering them only after
+      // navigation can replace the shared React chunks while an old page is open.
+      include: [
+        "@tanstack/react-query",
+        "@supabase/supabase-js",
+        "@radix-ui/react-dialog",
+        "@radix-ui/react-dropdown-menu",
+        "@radix-ui/react-slot",
+        "@radix-ui/react-switch",
+        "@radix-ui/react-tabs",
+        "lucide-react",
+        "sonner",
+        "class-variance-authority",
+        "clsx",
+        "tailwind-merge",
+        "zod",
+      ],
+    },
+  },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
