@@ -12,13 +12,14 @@ import { ImageField } from "./ImageField";
 
 export function ContentSettings() {
   const content = useSiteContent();
-  const [group, setGroup] = useState(CONTENT_GROUPS[0].id);
+  const [group, setGroup] = useState<string>(CONTENT_GROUPS[0]?.id ?? "");
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const save = useServerFn(saveSiteContent);
   const queryClient = useQueryClient();
 
   const active = CONTENT_GROUPS.find((g) => g.id === group) ?? CONTENT_GROUPS[0];
+  if (!active) return null;
   const value = (key: string) => draft[key] ?? content[key as keyof typeof content] ?? "";
   const dirty = Object.keys(draft).length > 0;
 

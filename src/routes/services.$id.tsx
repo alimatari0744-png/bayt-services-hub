@@ -19,7 +19,7 @@ export const Route = createFileRoute("/services/$id")({
   }),
   loader: ({ params, context }) => context.queryClient.ensureQueryData({
     queryKey: ["service", params.id],
-    queryFn: async () => {
+    queryFn: async (): Promise<Service> => {
       const { data, error } = await (await import("@/integrations/supabase/client")).supabase
         .from("services").select("*").eq("id", params.id).eq("is_active", true).maybeSingle();
       if (error) throw error;

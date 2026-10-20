@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useImageUrl } from "@/lib/services";
 
-export function ImageField({ label, hint, value, onChange }: { label: string; hint?: string; value: string; onChange: (value: string) => void }) {
+export function ImageField({ label, hint, value, onChange }: { label: string; hint?: string | undefined; value: string; onChange: (value: string) => void }) {
   const [uploading, setUploading] = useState(false);
   const shown = useImageUrl(value || null);
   const inputRef = useRef<HTMLInputElement>(null);
