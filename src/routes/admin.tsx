@@ -191,7 +191,7 @@ function Dashboard() {
                   <p className="text-sm text-muted-foreground">{r.services?.title ?? "طلب خدمة عام"} — {new Date(r.created_at).toLocaleString("ar-SA")}</p>
                   {r.message && <p className="mt-1 text-sm">{r.message}</p>}
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => removeRequest(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                <Button size="icon" variant="ghost" aria-label="حذف الطلب" onClick={() => removeRequest(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               </div>
             ))}
           </div>
@@ -219,8 +219,8 @@ function ServiceRow({ service, onEdit, onDelete }: { service: Service; onEdit: (
         </p>
       </div>
       <div className="flex shrink-0 gap-1">
-        <Button size="icon" variant="ghost" onClick={onEdit}><Pencil className="h-4 w-4" /></Button>
-        <Button size="icon" variant="ghost" onClick={onDelete}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+        <Button size="icon" variant="ghost" aria-label="تعديل الخدمة" onClick={onEdit}><Pencil className="h-4 w-4" /></Button>
+        <Button size="icon" variant="ghost" aria-label="حذف الخدمة" onClick={onDelete}><Trash2 className="h-4 w-4 text-destructive" /></Button>
       </div>
     </div>
   );
