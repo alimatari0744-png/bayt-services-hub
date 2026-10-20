@@ -1,40 +1,51 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ChevronDown, LayoutGrid, Search, SlidersHorizontal } from "lucide-react";
-import { SECTIONS, type Section } from "@/lib/services";
+import { servicesQuery, type Section } from "@/lib/services";
 import { sectionText, useSiteContent } from "@/lib/site-content";
 import { smartSearch } from "@/lib/search";
 import { ServiceCard } from "./ServiceCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { BROWSE_FILTERS, browseProperties, type PropertyBrowseFilters } from "@/lib/property-browsing";
+import {
+  DEMO_CITIES,
+  EMPTY_PROPERTY_FILTERS,
+  PROPERTY_FILTER_LABELS,
+  PROPERTY_PURPOSES,
+  PROPERTY_SORTS,
+  PROPERTY_TYPES,
+  browseProperties,
+  type PropertyFilters,
+} from "@/lib/property-browsing";
 
-type Props = { section: Section; items: { id: string; title: string; description: string; keywords: string; category: string; subcategory: string; price: string | null; location: string | null; image_url: string | null; map_url: string | null }[] };
+const FILTERS = [
+  { key: "city", label: PROPERTY_FILTER_LABELS[0], all: "كل المدن", reset: "", options: DEMO_CITIES.map((v) => ({ value: v, label: v })) },
+  { key: "type", label: PROPERTY_FILTER_LABELS[1], all: "كل الأنواع", reset: "", options: PROPERTY_TYPES.map((v) => ({ value: v, label: v })) },
+  { key: "purpose", label: PROPERTY_FILTER_LABELS[2], all: "كل الأغراض", reset: "", options: PROPERTY_PURPOSES.map((v) => ({ value: v, label: v })) },
+  { key: "sort", label: PROPERTY_FILTER_LABELS[3], all: "الأحدث", reset: "newest", options: PROPERTY_SORTS.map((s) => ({ value: s.value, label: s.label })) },
+] as const;
 
-export function SectionPage({ section, items }: Props) {
+export function SectionPage({ section }: { section: Section }) {
   const content = useSiteContent();
+  const { data: items } = useSuspenseQuery(servicesQuery(section));
   const [q, setQ] = useState("");
-  const [filters, setFilters] = useState<PropertyBrowseFilters>({});
-  const meta = SECTIONS[section];
+  const [filters, setFilters] = useState<PropertyFilters>(EMPTY_PROPERTY_FILTERS);
   const label = sectionText(content, section, "label");
   const tagline = sectionText(content, section, "tagline");
+  const filtered = q.trim().length > 0 || filters.city !== "" || filters.type !== "" || filters.purpose !== "" || filters.sort !== "newest";
 
   const results = useMemo(() => {
-    if (section !== "real_estate") return smartSearch(q, items);
     const searched = smartSearch(q, items);
-    return browseProperties(
-      searched,
-      filters,
-      (item) => ({ id: item.id, category: item.category, subcategory: item.subcategory, title: item.title, description: item.description, price: item.price, location: item.location, map_url: item.map_url }),
-    );
+    return section === "real_estate" ? browseProperties(searched, filters) : searched;
   }, [q, filters, items, section]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 md:py-16">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <span className="inline-block rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-foreground">{meta.icon}</span>
+          <span className="inline-block rounded-full bg-gold/15 px-3 py-1 text-xs font-semibold text-gold-foreground">{content["nav.sections"]}</span>
           <h1 className="mt-3 font-display text-3xl font-bold md:text-4xl">{label}</h1>
           <p className="mt-2 max-w-xl text-muted-foreground">{tagline}</p>
         </div>
@@ -57,7 +68,7 @@ export function SectionPage({ section, items }: Props) {
 
         {section === "real_estate" && (
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {BROWSE_FILTERS.map((dropdown) => (
+            {FILTERS.map((dropdown) => (
               <DropdownMenu key={dropdown.key}>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -74,15 +85,12 @@ export function SectionPage({ section, items }: Props) {
                     <ChevronDown className="pointer-events-none h-4 w-4 shrink-0" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56 max-h-72 overflow-y-auto">
-                  <DropdownMenuItem onSelect={() => setFilters((current) => ({ ...current, [dropdown.key]: undefined }))}>
+                <DropdownMenuContent align="start" className="max-h-72 w-56 overflow-y-auto">
+                  <DropdownMenuItem onSelect={() => setFilters((current) => ({ ...current, [dropdown.key]: dropdown.reset }))}>
                     {dropdown.all}
                   </DropdownMenuItem>
                   {dropdown.options.map((option) => (
-                    <DropdownMenuItem
-                      key={option.value}
-                      onSelect={() => setFilters((current) => ({ ...current, [dropdown.key]: option.value }))}
-                    >
+                    <DropdownMenuItem key={option.value} onSelect={() => setFilters((current) => ({ ...current, [dropdown.key]: option.value }))}>
                       {option.label}
                     </DropdownMenuItem>
                   ))}
@@ -97,8 +105,8 @@ export function SectionPage({ section, items }: Props) {
             {section === "real_estate" ? <SlidersHorizontal className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
             {results.length} {content["search.count"]}
           </span>
-          {(q || Object.values(filters).some(Boolean)) && (
-            <Button variant="ghost" size="sm" onClick={() => { setQ(""); setFilters({}); }}>
+          {filtered && (
+            <Button variant="ghost" size="sm" onClick={() => { setQ(""); setFilters(EMPTY_PROPERTY_FILTERS); }}>
               إعادة تعيين البحث
             </Button>
           )}

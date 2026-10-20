@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { Button } from "@/components/ui/button";
 import { useSiteContent } from "@/lib/site-content";
 
 export function SiteHeader() {

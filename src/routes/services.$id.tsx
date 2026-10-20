@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowRight, Clock, MapPin, PencilRuler, Phone } from "lucide-react";
 import { SECTIONS, useImageUrl, type Service } from "@/lib/services";
 import { geographicUrl } from "@/lib/service-filters";
-import { useSiteContent } from "@/lib/site-content";
+import { sectionText, useSiteContent } from "@/lib/site-content";
 import { RequestForm } from "@/components/site/RequestForm";
 import { Button } from "@/components/ui/button";
 
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/services/$id")({
 
 function ServiceDetail() {
   const service = Route.useLoaderData();
+  if (!service) throw notFound();
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
   const isProperty = service.section === "real_estate";
@@ -41,8 +42,8 @@ function ServiceDetail() {
 
   return (
     <article className="mx-auto max-w-6xl px-4 py-10 md:py-14">
-      <Link to={`/${SECTIONS[service.section].slug}`} className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-        <ArrowRight className="h-4 w-4" /> {content[`section.${service.section}.label` as const]}
+      <Link to={SECTIONS[service.section].path} className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+        <ArrowRight className="h-4 w-4" /> {sectionText(content, service.section, "label")}
       </Link>
 
       <header className="mt-4">
