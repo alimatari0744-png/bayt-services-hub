@@ -14,16 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          name: string
+          phone: string
+          service_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string
+          name: string
+          phone: string
+          service_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          name?: string
+          phone?: string
+          service_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          category: string
+          contact_phone: string | null
+          created_at: string
+          description: string
+          id: string
+          image_url: string | null
+          is_active: boolean
+          keywords: string
+          location: string | null
+          price: string | null
+          section: Database["public"]["Enums"]["service_section"]
+          title: string
+        }
+        Insert: {
+          category?: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          keywords?: string
+          location?: string | null
+          price?: string | null
+          section: Database["public"]["Enums"]["service_section"]
+          title: string
+        }
+        Update: {
+          category?: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          keywords?: string
+          location?: string | null
+          price?: string | null
+          section?: Database["public"]["Enums"]["service_section"]
+          title?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      service_section: "general" | "real_estate" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +254,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      service_section: ["general", "real_estate", "student"],
+    },
   },
 } as const
