@@ -49,7 +49,8 @@ export function useImageUrl(path: string | null | undefined) {
   useEffect(() => {
     if (!path) return setUrl(null);
     if (path.startsWith("http")) return setUrl(path);
-    if (urlCache.has(path)) return setUrl(urlCache.get(path)!);
+    const cached = urlCache.get(path);
+    if (cached) return setUrl(cached);
     let cancelled = false;
     supabase.storage
       .from("service-images")
