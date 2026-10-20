@@ -22,3 +22,31 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Self-hosting on Vercel (advanced)
+
+The codebase is portable — all demo images and logos are real files inside the
+repository (`public/images/`, `src/assets/`), so nothing depends on Lovable's
+asset CDN. The backend (database, auth, storage) stays on Lovable Cloud.
+
+1. Sync the repo to GitHub (Lovable → Project settings → Git), then import it
+   into Vercel from your GitHub account.
+2. Add the environment variables from the project's `.env` file in Vercel
+   (Settings → Environment Variables):
+   `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_PROJECT_ID`,
+   `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID`.
+   Server-side code reads the non-`VITE_` ones at runtime, so they must be set
+   in the hosting dashboard, not only in `.env`.
+3. Build with the Vercel output preset and deploy:
+
+   ```sh
+   npm i
+   DEPLOY_PRESET=vercel npm run build
+   npx vercel deploy --prebuilt
+   ```
+
+   (or set the Build Command to `DEPLOY_PRESET=vercel npm run build` in the
+   Vercel project settings and deploy from Git.)
+
+Without `DEPLOY_PRESET`, the build targets Lovable's Cloudflare deployment as
+usual — preview and publishing inside Lovable are unaffected.
