@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Removed map actions from browsing cards; mobile browser checks confirm property details retain the map beside the price and all sections show price before specifications without general/student location links.
 - Price directly below service image before specifications; old information band removed, admin price labeled, visibility/keyword inputs removed, common English hints inferred from Arabic content (tests passed).
 - Free Leaflet/OpenStreetMap property picker replaces coordinate inputs; manual point selection, device location, save/reopen, customer map URL and temporary-data cleanup verified through authenticated UI. Google Maps destination itself remains unverified.
 - Automatically show an optional blank specification paragraph for new/edit forms, ignoring it when empty; property-only coordinate window, save/reopen and exact customer Google Maps destination verified. Google Maps itself remains unverified in the sandbox.
