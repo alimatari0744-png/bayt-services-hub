@@ -26,6 +26,10 @@ export const Route = createFileRoute("/admin")({
       { name: "robots", content: "noindex" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { tab?: "overview" | "services" | "requests" | "settings" } => {
+    const t = s.tab;
+    return t === "services" || t === "requests" || t === "settings" || t === "overview" ? { tab: t } : {};
+  },
   component: Admin,
 });
 
@@ -61,7 +65,9 @@ function Admin() {
 
 function Dashboard() {
   const content = useSiteContent();
-  const [tab, setTab] = useState<TabId>("overview");
+  const tab: TabId = Route.useSearch().tab ?? "overview";
+  const nav = useNavigate();
+  const setTab = (t: TabId) => nav({ to: "/admin", search: { tab: t } });
   const [services, setServices] = useState<Service[]>([]);
   const [requests, setRequests] = useState<Req[]>([]);
   const [section, setSection] = useState<Section>("general");
