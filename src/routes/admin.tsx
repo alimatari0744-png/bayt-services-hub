@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { geographicUrl } from "@/lib/service-filters";
-import { CLASSIFICATION_GROUPS, classificationAssignmentsValid, classificationsQuery, resolvePropertyClassifications } from "@/lib/property-classifications";
+import { CLASSIFICATION_GROUPS, EMPTY_CLASSIFICATIONS, classificationAssignmentsValid, classificationsQuery, resolvePropertyClassifications } from "@/lib/property-classifications";
 import { PROPERTY_SORTS, browseProperties, EMPTY_PROPERTY_FILTERS } from "@/lib/property-browsing";
 import { PropertyClassifications } from "@/components/admin/PropertyClassifications";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -261,7 +261,7 @@ function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: 
   const [file, setFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [paragraphs, setParagraphs] = useState<SpecificationParagraph[]>([]);
-  const { data: classifications = [], isPending: classificationsLoading } = useQuery(classificationsQuery);
+  const { data: classifications = EMPTY_CLASSIFICATIONS, isPending: classificationsLoading } = useQuery(classificationsQuery);
   const queryClient = useQueryClient();
   const current = useImageUrl(form.image_url);
   useEffect(() => {

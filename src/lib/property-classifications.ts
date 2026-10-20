@@ -5,6 +5,7 @@ import type { Service } from "./services";
 
 export type ClassificationKind = "city" | "type" | "purpose";
 export type Classification = { id: string; kind: string; label: string };
+export const EMPTY_CLASSIFICATIONS: Classification[] = [];
 export const CLASSIFICATION_GROUPS = [
   { kind: "city", field: "city_id", label: "المدينة" },
   { kind: "type", field: "property_type_id", label: "النوع" },
