@@ -4,3 +4,6 @@
 - [x] Verify service browsing and service/general request submission on desktop and mobile.
 - [ ] Verify admin save end-to-end: blocked because no auth account exists; owner must create/sign in to an account.
 - [x] Stabilize lazy-route dependency prebundling; fresh loads, repeated client navigation, property dropdown, detail and request dialog verified without runtime errors.
+- [ ] Add a distinct demo photograph for every existing service.
+- [ ] Place specifications below the title, restrict location to properties, and close mobile navigation on outside clicks.
+- [ ] Verify images, detail order, property links and mobile menu dismissal.
