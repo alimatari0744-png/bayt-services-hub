@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Automatically show an optional blank specification paragraph for new/edit forms, ignoring it when empty; property-only coordinate window, save/reopen and exact customer Google Maps destination verified. Google Maps itself remains unverified in the sandbox.
 - Owner-managed city/type/purpose classifications shared by property editing and customer browsing; mobile navigation, creation, editing, assignment persistence, rename matching, restricted deletion and anonymous combined filtering verified.
 - All three service sections support free-text specifications followed by + added title/content paragraphs displayed side by side; saving, reopening, public display, and mobile layout verified through the admin UI.
 - Property specification title/content paragraphs with demo entries saved through the admin UI; refreshed RTL dropdowns; footer and request WhatsApp links and request call links verified.
@@ -16,6 +17,6 @@
 
 ## Open
 - Owner to replace demo contact details (email, address, opening hours) from Settings.
-- Real map links for each property listing (needs the owner's actual URLs).
+- Owner to enter actual property coordinates and validate Google Maps destinations on the deployed site.
 - GitHub connection: settings → Git in the project.
 - Owner deploys the GitHub copy on Vercel from their own account (agent has no access); verify the deployment's build there.

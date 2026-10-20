@@ -10,8 +10,7 @@ import { RequestForm } from "./RequestForm";
 export function ServiceCard({ service, index = 0 }: { service: Service; index?: number }) {
   const img = useImageUrl(service.image_url);
   const content = useSiteContent();
-  const propertyLocation = service.section === "real_estate" ? service.location?.trim() || null : null;
-  const map = service.section === "real_estate" ? geographicUrl(service.map_url, service.location) : null;
+  const map = service.section === "real_estate" ? geographicUrl(service.map_url, null) : null;
 
   return (
     <article
@@ -39,9 +38,8 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
           <span className="font-display font-bold text-primary">{service.price || content["service.price_fallback"]}</span>
           <span className="relative z-20"><RequestDialog service={service} /></span>
         </div>
-        {(propertyLocation || map) && (
+        {map && (
           <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
-            <span className="truncate text-xs text-muted-foreground">{propertyLocation}</span>
             {map && (
               <Button asChild variant="ghost" size="icon" className="relative z-20">
                 <a href={map} target="_blank" rel="noopener noreferrer" aria-label={content["service.map_label"]} title={content["service.map_label"]}>

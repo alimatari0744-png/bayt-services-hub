@@ -14,12 +14,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { geographicUrl } from "@/lib/service-filters";
+import { PropertyLocationField } from "@/components/admin/PropertyLocationField";
+import { propertyCoordinatePayload } from "@/lib/property-coordinates";
 import { CLASSIFICATION_GROUPS, EMPTY_CLASSIFICATIONS, classificationAssignmentsValid, classificationsQuery, resolvePropertyClassifications } from "@/lib/property-classifications";
 import { PROPERTY_SORTS, browseProperties, EMPTY_PROPERTY_FILTERS } from "@/lib/property-browsing";
 import { PropertyClassifications } from "@/components/admin/PropertyClassifications";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { contactLinks } from "@/lib/contact-links";
-import { parseServiceSpecifications, serializeServiceSpecifications, type SpecificationParagraph } from "@/lib/specification-paragraphs";
+import { parseServiceSpecifications, serializeServiceSpecifications, specificationParagraphDrafts, incompleteSpecificationParagraphs, type SpecificationParagraph } from "@/lib/specification-paragraphs";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -273,7 +275,7 @@ function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: 
       for (const {kind,field} of CLASSIFICATION_GROUPS) assignments[field] = value[field] ?? classifications.find((option) => option.kind === kind && option.label === legacy[kind])?.id ?? null;
     }
     setForm({ ...value, ...assignments, specifications: structured.text });
-    setParagraphs(structured.paragraphs);
+    setParagraphs(specificationParagraphDrafts(value?.specifications));
     setFile(null);
   }, [value, classifications]);
 
@@ -282,7 +284,7 @@ function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: 
 
   async function save() {
     if (!form.title?.trim()) { toast.error("العنوان مطلوب"); return; }
-    if (paragraphs.some((paragraph) => !paragraph.title.trim() || !paragraph.content.trim())) { toast.error("أدخل عنوان ومحتوى كل فقرة"); return; }
+    if (incompleteSpecificationParagraphs(paragraphs)) { toast.error("أدخل عنوان ومحتوى كل فقرة"); return; }
     if (sec === "real_estate" && !classificationAssignmentsValid(form, classifications)) { toast.error("اختر المدينة والنوع والغرض من التصنيفات"); return; }
     if (sec === "real_estate" && form.map_url?.trim() && !geographicUrl(form.map_url.trim(), null)) { toast.error("أدخل رابط موقع صحيحاً يبدأ بـ https://"); return; }
     setSaving(true);
@@ -301,11 +303,10 @@ function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: 
       property_type_id: sec === "real_estate" ? form.property_type_id ?? null : null,
       purpose_id: sec === "real_estate" ? form.purpose_id ?? null : null,
       specifications: serializeServiceSpecifications({ text: form.specifications ?? "", paragraphs }),
-      map_url: sec === "real_estate" ? form.map_url?.trim() || null : null,
+      ...propertyCoordinatePayload(sec, form.map_url),
       title: form.title.trim(),
       description: form.description ?? "",
       price: form.price ?? null,
-      location: form.location ?? null,
       keywords: form.keywords ?? "",
       contact_phone: form.contact_phone ?? null,
       is_active: form.is_active ?? true,
@@ -365,11 +366,8 @@ function ServiceForm({ value, onClose, onSaved, propertySort, onPropertySort }: 
               <Textarea id={`paragraph-content-${index}`} rows={3} value={paragraph.content} onChange={(event) => setParagraphs((current) => current.map((item, i) => i === index ? { ...item, content: event.target.value } : item))} />
             </div>)}
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Input placeholder="السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} />
-            <Input placeholder="الموقع" value={form.location ?? ""} onChange={(e) => set("location", e.target.value)} />
-          </div>
-          {sec === "real_estate" && <div><label htmlFor="map-url" className="mb-2 block text-sm">رابط الموقع الجغرافي</label><Input id="map-url" type="url" dir="ltr" placeholder="https://maps.google.com/..." value={form.map_url ?? ""} onChange={(e) => set("map_url", e.target.value)} /></div>}
+          <Input placeholder="السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} />
+          {sec === "real_estate" && <PropertyLocationField value={form.map_url} onChange={(value) => set("map_url", value)} />}
           <Input placeholder="كلمات مفتاحية للبحث (مفصولة بمسافة)" value={form.keywords ?? ""} onChange={(e) => set("keywords", e.target.value)} />
           <div>
             <p className="mb-2 text-sm text-muted-foreground">صورة الخدمة</p>

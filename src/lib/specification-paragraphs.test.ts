@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseServiceSpecifications, serializeServiceSpecifications, parseSpecificationParagraphs, serializeSpecificationParagraphs } from "./specification-paragraphs";
+import { parseServiceSpecifications, serializeServiceSpecifications, parseSpecificationParagraphs, serializeSpecificationParagraphs, specificationParagraphDrafts, incompleteSpecificationParagraphs } from "./specification-paragraphs";
 
 describe("property specification paragraphs", () => {
   it("saves and restores each paragraph title and content", () => {
@@ -13,6 +13,20 @@ describe("property specification paragraphs", () => {
 });
 
 describe("all service specifications", () => {
+  it("opens an empty paragraph for a new service", () => {
+    expect(specificationParagraphDrafts(undefined)).toEqual([{ title: "", content: "" }]);
+  });
+  it("opens an extra empty paragraph without replacing saved paragraphs", () => {
+    expect(specificationParagraphDrafts('[{"title":"نوع الأثاث","content":"مستورد"}]')).toEqual([{ title: "نوع الأثاث", content: "مستورد" }, { title: "", content: "" }]);
+  });
+  it("ignores untouched paragraphs on save", () => {
+    expect(serializeServiceSpecifications({ text: "تفاصيل", paragraphs: [{ title: "  ", content: "" }] })).toBe("تفاصيل");
+    expect(incompleteSpecificationParagraphs([{ title: "", content: "" }])).toBe(false);
+  });
+  it("requires both fields only when a paragraph is started", () => {
+    expect(incompleteSpecificationParagraphs([{ title: "عنوان", content: "" }])).toBe(true);
+    expect(incompleteSpecificationParagraphs([{ title: "", content: "محتوى" }])).toBe(true);
+  });
   it("preserves free text followed by optional title/content paragraphs", () => {
     const specifications = { text: "تفاصيل الخدمة المكتوبة", paragraphs: [{ title: "نوع الأثاث", content: "أثاث مستورد عالي الجودة" }] };
     expect(parseServiceSpecifications(serializeServiceSpecifications(specifications))).toEqual(specifications);
