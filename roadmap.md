@@ -1,5 +1,9 @@
 # Roadmap
 
+## In progress
+- Move price directly below service image and remove old information band; label admin price; remove visibility/keyword inputs; automatically recognize English hints.
+- Replace coordinate inputs with Google Maps point selection and device location.
+
 ## Done
 - Automatically show an optional blank specification paragraph for new/edit forms, ignoring it when empty; property-only coordinate window, save/reopen and exact customer Google Maps destination verified. Google Maps itself remains unverified in the sandbox.
 - Owner-managed city/type/purpose classifications shared by property editing and customer browsing; mobile navigation, creation, editing, assignment persistence, rename matching, restricted deletion and anonymous combined filtering verified.
