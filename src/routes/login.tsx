@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "@/components/site/Logo";
+import { useSiteContent } from "@/lib/site-content";
+import { loginIdentity } from "@/lib/phone-auth";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -22,6 +24,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
+  const content = useSiteContent();
   const [mode, setMode] = useState<"in" | "up">("in");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -29,13 +32,14 @@ function Login() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const email = String(fd.get("email"));
+    const email = loginIdentity(String(fd.get("identity")));
     const password = String(fd.get("password"));
+    if (!email) { toast.error(content["login.invalid"]); return; }
     setLoading(true);
     if (mode === "in") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       setLoading(false);
-      if (error) { toast.error("بيانات الدخول غير صحيحة"); return; }
+      if (error) { toast.error(content["login.wrong"]); return; }
       navigate({ to: "/admin" });
     } else {
       const { error } = await supabase.auth.signUp({
@@ -45,7 +49,7 @@ function Login() {
       });
       setLoading(false);
       if (error) { toast.error(error.message); return; }
-      toast.success("تم إنشاء الحساب، تحقق من بريدك لتأكيده");
+      toast.success(content["login.created"]);
       setMode("in");
     }
   }
@@ -54,16 +58,16 @@ function Login() {
     <div className="mx-auto flex min-h-[70vh] max-w-md items-center px-4 py-16">
       <div className="w-full rounded-3xl border border-border bg-card p-8 shadow-lift">
         <Logo />
-        <h1 className="mt-6 text-2xl font-bold">{mode === "in" ? "دخول الإدارة" : "إنشاء حساب"}</h1>
+        <h1 className="mt-6 text-2xl font-bold">{mode === "in" ? content["login.title_in"] : content["login.title_up"]}</h1>
         <form onSubmit={submit} className="mt-6 space-y-3">
-          <Input name="email" type="email" placeholder="البريد الإلكتروني" required dir="ltr" />
-          <Input name="password" type="password" placeholder="كلمة المرور" minLength={6} required dir="ltr" />
+          <Input name="identity" placeholder={content["login.identity_placeholder"]} required autoComplete="username" dir="ltr" />
+          <Input name="password" type="password" placeholder={content["login.password_placeholder"]} minLength={6} required dir="ltr" />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "..." : mode === "in" ? "دخول" : "إنشاء الحساب"}
+            {loading ? "..." : mode === "in" ? content["login.submit_in"] : content["login.submit_up"]}
           </Button>
         </form>
         <button onClick={() => setMode(mode === "in" ? "up" : "in")} className="mt-4 text-sm text-primary hover:underline">
-          {mode === "in" ? "ليس لديك حساب؟ أنشئ حساباً" : "لديك حساب؟ سجّل الدخول"}
+          {mode === "in" ? content["login.switch_up"] : content["login.switch_in"]}
         </button>
       </div>
     </div>
