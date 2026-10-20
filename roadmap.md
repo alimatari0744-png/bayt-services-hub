@@ -1,0 +1,6 @@
+- [x] Remove general/student category filters and refine four real-estate dropdowns.
+- [x] Add service detail pages with specifications and geographic links, editable by admin.
+- [x] Add general contact requests and full navigation labels.
+- [x] Verify service browsing and service/general request submission on desktop and mobile.
+- [ ] Verify admin save end-to-end: blocked because no auth account exists; owner must create/sign in to an account.
+- [x] Stabilize lazy-route dependency prebundling; fresh loads, repeated client navigation, property dropdown, detail and request dialog verified without runtime errors.

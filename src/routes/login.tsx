@@ -13,6 +13,8 @@ export const Route = createFileRoute("/login")({
       { name: "description", content: "دخول إدارة مركز الخدمات الشاملة." },
       { property: "og:title", content: "تسجيل الدخول | مركز الخدمات الشاملة" },
       { property: "og:description", content: "دخول إدارة مركز الخدمات الشاملة." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),

@@ -60,8 +60,11 @@ export type Database = {
           is_active: boolean
           keywords: string
           location: string | null
+          map_url: string | null
           price: string | null
           section: Database["public"]["Enums"]["service_section"]
+          specifications: string
+          subcategory: string
           title: string
         }
         Insert: {
@@ -74,8 +77,11 @@ export type Database = {
           is_active?: boolean
           keywords?: string
           location?: string | null
+          map_url?: string | null
           price?: string | null
           section: Database["public"]["Enums"]["service_section"]
+          specifications?: string
+          subcategory?: string
           title: string
         }
         Update: {
@@ -88,8 +94,11 @@ export type Database = {
           is_active?: boolean
           keywords?: string
           location?: string | null
+          map_url?: string | null
           price?: string | null
           section?: Database["public"]["Enums"]["service_section"]
+          specifications?: string
+          subcategory?: string
           title?: string
         }
         Relationships: []

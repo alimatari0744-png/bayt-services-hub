@@ -22,8 +22,7 @@ export function SiteFooter() {
         <div>
           <h4 className="mb-3 font-bold text-gold">تواصل معنا</h4>
           <ul className="space-y-2 text-sm text-primary-foreground/80">
-            <li>الهاتف: 0500000000</li>
-            <li>البريد: info@example.com</li>
+            <li><Link to="/contact" className="hover:text-gold">تواصل معنا واطلب خدمة</Link></li>
             <li><Link to="/admin" className="hover:text-gold">لوحة الإدارة</Link></li>
           </ul>
         </div>

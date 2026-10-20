@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PROPERTY_CATEGORIES, geographicUrl } from "@/lib/service-filters";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -19,6 +20,8 @@ export const Route = createFileRoute("/admin")({
       { name: "description", content: "إدارة الخدمات والطلبات." },
       { property: "og:title", content: "لوحة الإدارة | مركز الخدمات الشاملة" },
       { property: "og:description", content: "إدارة الخدمات والطلبات." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -138,7 +141,7 @@ function Dashboard({ email }: { email: string }) {
               <div key={r.id} className="flex items-start justify-between gap-4 border-b border-border p-4 last:border-0">
                 <div>
                   <p className="font-semibold">{r.name} · <a href={`tel:${r.phone}`} className="text-primary" dir="ltr">{r.phone}</a></p>
-                  <p className="text-sm text-muted-foreground">{r.services?.title ?? "خدمة محذوفة"} — {new Date(r.created_at).toLocaleString("ar-SA")}</p>
+                  <p className="text-sm text-muted-foreground">{r.services?.title ?? "طلب خدمة عام"} — {new Date(r.created_at).toLocaleString("ar-SA")}</p>
                   {r.message && <p className="mt-1 text-sm">{r.message}</p>}
                 </div>
                 <Button size="icon" variant="ghost" onClick={() => removeRequest(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
@@ -168,6 +171,8 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
 
   async function save() {
     if (!form.title?.trim()) { toast.error("العنوان مطلوب"); return; }
+    if (sec === "real_estate" && !PROPERTY_CATEGORIES.some((c) => c === form.category)) { toast.error("اختر أحد التصنيفات العقارية الأربعة"); return; }
+    if (sec === "real_estate" && form.map_url?.trim() && !geographicUrl(form.map_url.trim(), null)) { toast.error("أدخل رابط موقع صحيحاً يبدأ بـ https://"); return; }
     setSaving(true);
     let image_url = form.image_url ?? null;
     if (file) {
@@ -178,7 +183,10 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
     }
     const payload = {
       section: sec,
-      category: form.category ?? "",
+      category: sec === "real_estate" ? form.category ?? "" : "",
+      subcategory: sec === "real_estate" ? form.subcategory?.trim() ?? "" : "",
+      specifications: form.specifications ?? "",
+      map_url: sec === "real_estate" ? form.map_url?.trim() || null : null,
       title: form.title.trim(),
       description: form.description ?? "",
       price: form.price ?? null,
@@ -205,23 +213,26 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
         </DialogHeader>
         <div className="space-y-3">
           <Input placeholder="عنوان الخدمة" value={form.title ?? ""} onChange={(e) => set("title", e.target.value)} />
-          <div>
+          {sec === "real_estate" && <div>
             <p className="mb-2 text-sm text-muted-foreground">التصنيف</p>
             <div className="flex flex-wrap gap-2">
-              {SECTIONS[sec].categories.map((c) => (
-                <button key={c} type="button" onClick={() => set("category", c)}
-                  className={`rounded-full px-3 py-1.5 text-sm ${form.category === c ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
+              {PROPERTY_CATEGORIES.map((c) => (
+                <Button key={c} type="button" size="sm" variant={form.category === c ? "default" : "secondary"} onClick={() => { set("category", c); set("subcategory", ""); }}>
                   {c}
-                </button>
+                </Button>
               ))}
             </div>
-            <Input className="mt-2" placeholder="أو اكتب تصنيفاً جديداً" value={form.category ?? ""} onChange={(e) => set("category", e.target.value)} />
-          </div>
+            <label className="mb-2 mt-3 block text-sm" htmlFor="subcategory">التصنيف الفرعي</label>
+            <Input id="subcategory" placeholder="التصنيف الفرعي" maxLength={100} value={form.subcategory ?? ""} onChange={(e) => set("subcategory", e.target.value)} />
+          </div>}
           <Textarea placeholder="الوصف" value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} />
+          <label className="block text-sm" htmlFor="specifications">مواصفات الخدمة وتفاصيلها</label>
+          <Textarea id="specifications" rows={5} value={form.specifications ?? ""} onChange={(e) => set("specifications", e.target.value)} />
           <div className="grid grid-cols-2 gap-3">
             <Input placeholder="السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} />
             <Input placeholder="الموقع" value={form.location ?? ""} onChange={(e) => set("location", e.target.value)} />
           </div>
+          {sec === "real_estate" && <div><label htmlFor="map-url" className="mb-2 block text-sm">رابط الموقع الجغرافي</label><Input id="map-url" type="url" dir="ltr" placeholder="https://maps.google.com/..." value={form.map_url ?? ""} onChange={(e) => set("map_url", e.target.value)} /></div>}
           <Input placeholder="كلمات مفتاحية للبحث (مفصولة بمسافة)" value={form.keywords ?? ""} onChange={(e) => set("keywords", e.target.value)} />
           <div>
             <p className="mb-2 text-sm text-muted-foreground">صورة الخدمة</p>

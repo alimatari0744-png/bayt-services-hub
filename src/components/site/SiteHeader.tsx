@@ -2,12 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "./Logo";
+import { Button } from "@/components/ui/button";
 
 const links = [
   { to: "/", label: "الرئيسية" },
   { to: "/general", label: "الخدمات العامة" },
-  { to: "/real-estate", label: "العقارية" },
-  { to: "/students", label: "الطلابية" },
+  { to: "/real-estate", label: "الخدمات العقارية" },
+  { to: "/students", label: "الخدمات الطلابية" },
+  { to: "/contact", label: "تواصل معنا" },
 ] as const;
 
 export function SiteHeader() {
@@ -18,7 +20,7 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-2">
           <Logo />
         </Link>
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -30,12 +32,12 @@ export function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="القائمة">
+         <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(!open)} aria-label="القائمة" aria-expanded={open}>
           {open ? <X /> : <Menu />}
-        </button>
+        </Button>
       </div>
       {open && (
-        <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden">
+        <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 lg:hidden">
           {links.map((l) => (
             <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 hover:bg-secondary">
               {l.label}
