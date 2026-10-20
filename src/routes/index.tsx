@@ -9,6 +9,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "كل خدماتك في مكان واحد: معاملات عامة، عقارات للبيع والإيجار، وخدمات طلابية متكاملة." },
       { property: "og:title", content: "مركز الخدمات الشاملة" },
       { property: "og:description", content: "خدمات عامة وعقارية وطلابية في مكان واحد." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,

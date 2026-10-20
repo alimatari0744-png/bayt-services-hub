@@ -1,23 +1,26 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Search, SearchX } from "lucide-react";
+import { Search, SearchX, ChevronDown, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { SECTIONS, servicesQuery, type Section } from "@/lib/services";
 import { smartSearch } from "@/lib/search";
 import { ServiceCard } from "./ServiceCard";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { categoryFilters, filterServices } from "@/lib/service-filters";
+import { Link } from "@tanstack/react-router";
 
 export function SectionPage({ section }: { section: Section }) {
   const meta = SECTIONS[section];
   const { data } = useSuspenseQuery(servicesQuery(section));
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<string>("الكل");
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
   const [focused, setFocused] = useState(false);
 
-  const categories = useMemo(() => {
-    const set = new Set([...meta.categories, ...data.map((s) => s.category).filter(Boolean)]);
-    return ["الكل", ...Array.from(set).filter((c) => c !== "أخرى" || data.some((s) => s.category === "أخرى"))];
-  }, [data, meta.categories]);
+  const categories = categoryFilters(section);
+  const subcategories = useMemo(() => Object.fromEntries(categories.map((c) => [c, [...new Set(data.filter((s) => s.category === c).map((s) => s.subcategory).filter(Boolean))]])), [data, categories]);
 
-  const byCategory = category === "الكل" ? data : data.filter((s) => s.category === category);
+  const byCategory = filterServices(data, section, category, subcategory);
   const results = smartSearch(query, byCategory);
   const suggestions = query.trim() ? smartSearch(query, data).slice(0, 5) : [];
 
@@ -32,7 +35,7 @@ export function SectionPage({ section }: { section: Section }) {
       </section>
 
       <div className="relative z-10 mx-auto -mt-10 max-w-7xl px-4">
-        <div className="relative rounded-2xl border border-border bg-card p-3 shadow-lift">
+          <div className="relative rounded-lg border border-border bg-card p-3 shadow-lift">
           <div className="flex items-center gap-3 rounded-xl bg-muted px-4">
             <Search className="h-5 w-5 text-muted-foreground" />
             <input
@@ -41,6 +44,7 @@ export function SectionPage({ section }: { section: Section }) {
               onFocus={() => setFocused(true)}
               onBlur={() => setTimeout(() => setFocused(false), 150)}
               placeholder="اكتب أي تلميح... مثلاً: اقامة، شقه، بحث"
+              aria-label={`بحث في ${meta.label}`}
               className="h-14 w-full bg-transparent text-base outline-none placeholder:text-muted-foreground"
             />
           </div>
@@ -48,37 +52,38 @@ export function SectionPage({ section }: { section: Section }) {
             <ul className="absolute inset-x-3 top-full mt-2 overflow-hidden rounded-xl border border-border bg-popover shadow-lift">
               {suggestions.map((s) => (
                 <li key={s.id}>
-                  <button
+                  <Button variant="ghost"
                     onMouseDown={() => {
                       setQuery(s.title);
-                      setCategory("الكل");
+                      setCategory("");
+                      setSubcategory("");
                     }}
-                    className="flex w-full items-center justify-between px-4 py-3 text-right hover:bg-secondary"
+                    className="flex h-auto w-full items-center justify-between whitespace-normal px-4 py-3 text-right hover:bg-secondary"
                   >
                     <span className="font-medium">{s.title}</span>
-                    <span className="text-xs text-muted-foreground">{s.category}</span>
-                  </button>
+                    {section === "real_estate" && <span className="text-xs text-muted-foreground">{s.category}</span>}
+                  </Button>
                 </li>
               ))}
             </ul>
           )}
-          <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {categories.length > 0 && <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {categories.map((c) => (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
-                  category === c ? "bg-primary text-primary-foreground shadow-soft" : "bg-secondary text-secondary-foreground hover:bg-accent"
-                }`}
-              >
-                {c}
-              </button>
+              <DropdownMenu key={c} dir="rtl">
+                <DropdownMenuTrigger asChild><Button variant={category === c ? "default" : "secondary"} className="h-11 w-full justify-between px-3">{c}<ChevronDown className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onSelect={() => { setCategory(c); setSubcategory(""); }}>جميع {c}</DropdownMenuItem>
+                  {(subcategories[c] ?? []).map((sub) => <DropdownMenuItem key={sub} onSelect={() => { setCategory(c); setSubcategory(sub); }}>{sub}</DropdownMenuItem>)}
+                </DropdownMenuContent>
+              </DropdownMenu>
             ))}
-          </div>
+          </div>}
+          {section === "real_estate" && category && <div className="mt-3 flex items-center justify-between gap-2 text-sm"><span>{category}{subcategory ? ` / ${subcategory}` : ""}</span><Button variant="ghost" size="sm" onClick={() => { setCategory(""); setSubcategory(""); }}><X className="h-4 w-4" />عرض الكل</Button></div>}
         </div>
 
         <div className="mt-8 flex items-center justify-between text-sm text-muted-foreground">
           <span>{results.length} خدمة</span>
+          <Button asChild variant="outline" size="sm"><Link to="/contact">طلب خدمة أخرى</Link></Button>
         </div>
 
         {results.length === 0 ? (
