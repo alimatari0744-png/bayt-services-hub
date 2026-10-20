@@ -35,6 +35,7 @@ export const Route = createFileRoute("/services/$id")({
 
 function ServiceDetail() {
   const service = Route.useLoaderData();
+  if (!service) throw notFound();
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
   const isProperty = service.section === "real_estate";
