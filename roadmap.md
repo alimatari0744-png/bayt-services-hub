@@ -1,0 +1,4 @@
+- [ ] Remove general/student category filters and refine four real-estate dropdowns.
+- [ ] Add service detail pages with specifications and geographic links, editable by admin.
+- [ ] Add general contact requests and full navigation labels.
+- [ ] Verify service browsing and request submission.
