@@ -57,6 +57,14 @@ function ServiceDetail() {
         <p className="mt-3 max-w-3xl text-lg text-muted-foreground">{service.description}</p>
       </header>
 
+      <div className="mt-6 overflow-hidden rounded-3xl border border-border bg-secondary">
+        {img ? (
+          <img src={img} alt={service.title} className="h-full min-h-[300px] w-full object-cover md:min-h-[440px]" />
+        ) : (
+          <div className="grid h-full min-h-[300px] w-full place-items-center text-muted-foreground">لا صورة</div>
+        )}
+      </div>
+
       <section className="mt-6 rounded-3xl border border-border bg-card p-6 md:p-8" aria-labelledby="service-specifications">
         <h2 id="service-specifications" className="flex items-center gap-2 text-xl font-bold"><PencilRuler className="h-5 w-5 text-primary" /> {content["service.specifications_title"]}</h2>
         <p className="mt-4 whitespace-pre-line leading-8">{specifications}</p>
@@ -68,16 +76,11 @@ function ServiceDetail() {
         {service.contact_phone && <span className="inline-flex items-center gap-2 rounded-full bg-background px-4 py-2"><Phone className="h-4 w-4 text-primary" /> {content["service.call_label"]}: <a href={`tel:${service.contact_phone}`} dir="ltr" className="hover:text-primary">{service.contact_phone}</a></span>}
       </section>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[1.25fr_1fr]">
-        <div className="overflow-hidden rounded-3xl border border-border bg-secondary">
-          {img ? <img src={img} alt={service.title} className="h-full min-h-[360px] w-full object-cover" /> : <div className="grid h-full min-h-[360px] place-items-center text-muted-foreground">لا صورة</div>}
-        </div>
-        <div className="rounded-3xl border border-border bg-card p-6">
-          <h2 className="text-xl font-bold">طلب هذه الخدمة</h2>
-          <p className="mt-2 text-sm text-muted-foreground">أدخل بياناتك وسنتواصل معك لإنجاز طلبك.</p>
-          {map && <Button asChild variant="outline" className="mt-4 w-full"><a href={map} target="_blank" rel="noopener noreferrer"><MapPin className="h-4 w-4" /> {content["service.map_label"]}</a></Button>}
-          <div className="mt-6"><RequestForm serviceId={service.id} /></div>
-        </div>
+      <div className="mt-8 rounded-3xl border border-border bg-card p-6 md:p-8">
+        <h2 className="text-xl font-bold">طلب هذه الخدمة</h2>
+        <p className="mt-2 text-sm text-muted-foreground">أدخل بياناتك وسنتواصل معك لإنجاز طلبك.</p>
+        {map && <Button asChild variant="outline" className="mt-4 w-full md:w-auto"><a href={map} target="_blank" rel="noopener noreferrer"><MapPin className="h-4 w-4" /> {content["service.map_label"]}</a></Button>}
+        <div className="mt-6 max-w-2xl"><RequestForm serviceId={service.id} /></div>
       </div>
     </article>
   );
