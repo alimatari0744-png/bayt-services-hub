@@ -3,3 +3,4 @@
 - [x] Add general contact requests and full navigation labels.
 - [x] Verify service browsing and service/general request submission on desktop and mobile.
 - [ ] Verify admin save end-to-end: blocked because no auth account exists; owner must create/sign in to an account.
+- [ ] Resolve preview React loading mismatch and verify all public pages.
