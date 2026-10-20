@@ -48,7 +48,7 @@ export function useImageUrl(path: string | null | undefined) {
   const [url, setUrl] = useState<string | null>(path ? urlCache.get(path) ?? null : null);
   useEffect(() => {
     if (!path) return setUrl(null);
-    if (path.startsWith("http") || path.startsWith("/__l5e/assets-v1/")) return setUrl(path);
+    if (path.startsWith("http") || path.startsWith("/__l5e/assets-v1/") || path.startsWith("/images/")) return setUrl(path);
     const cached = urlCache.get(path);
     if (cached) return setUrl(cached);
     let cancelled = false;

@@ -7,6 +7,10 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  // Self-hosting off Lovable (e.g. Vercel): build with DEPLOY_PRESET=vercel to
+  // switch the nitro output preset. Lovable builds don't set it and keep their
+  // own target, so preview/publish behavior is unchanged.
+  nitro: process.env.DEPLOY_PRESET ? { preset: process.env.DEPLOY_PRESET } : undefined,
   vite: {
     optimizeDeps: {
       // Prebundle lazy-route dependencies together. Discovering them only after
