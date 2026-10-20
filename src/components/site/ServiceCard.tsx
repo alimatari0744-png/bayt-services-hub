@@ -1,12 +1,13 @@
 import { MapPin, Sparkles } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { geographicUrl } from "@/lib/service-filters";
+import { geographicUrl, propertyLocation } from "@/lib/service-filters";
 import { useImageUrl, type Service } from "@/lib/services";
 import { RequestDialog } from "./RequestDialog";
 
 export function ServiceCard({ service, index = 0 }: { service: Service; index?: number }) {
   const img = useImageUrl(service.image_url);
+  const location = propertyLocation(service.section, service.location);
   const map = service.section === "real_estate" ? geographicUrl(service.map_url, service.location) : null;
   return (
     <article
@@ -30,9 +31,9 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
       <div className="flex flex-1 flex-col gap-3 p-5">
         <h3 className="text-lg font-bold leading-snug"><Link to="/services/$id" params={{ id: service.id }} className="hover:text-primary">{service.title}</Link></h3>
         <p className="line-clamp-2 text-sm text-muted-foreground">{service.description}</p>
-        {service.location && (
+        {location && (
           <p className="flex items-center gap-1 text-xs text-muted-foreground">
-            <MapPin className="h-3.5 w-3.5" /> {service.location}
+            <MapPin className="h-3.5 w-3.5" /> {location}
           </p>
         )}
         <div className="mt-auto flex items-center justify-between pt-3">
