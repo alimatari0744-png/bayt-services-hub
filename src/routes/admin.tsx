@@ -33,7 +33,7 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type Req = { id: string; name: string; phone: string; message: string; created_at: string; services: { title: string } | null };
+type Req = { id: string; name: string; phone: string; message: string; created_at: string; services: { title: string; section: Section } | null };
 
 const TABS = [
   { id: "overview", label: "نظرة عامة", icon: LayoutDashboard },
@@ -76,7 +76,7 @@ function Dashboard() {
   async function load() {
     const [s, r] = await Promise.all([
       supabase.from("services").select("*").order("created_at", { ascending: false }),
-      supabase.from("requests").select("id,name,phone,message,created_at,services(title)").order("created_at", { ascending: false }),
+      supabase.from("requests").select("id,name,phone,message,created_at,services(title,section)").order("created_at", { ascending: false }),
     ]);
     setServices(s.data ?? []);
     setRequests((r.data as Req[]) ?? []);
@@ -191,13 +191,21 @@ function Dashboard() {
           <div className="overflow-hidden rounded-2xl border border-border bg-card">
             {requests.length === 0 && <p className="p-8 text-center text-muted-foreground">لا توجد طلبات</p>}
             {requests.map((r) => (
-              <div key={r.id} className="flex items-start justify-between gap-4 border-b border-border p-4 last:border-0">
-                <div className="min-w-0">
-                  <p className="font-semibold">{r.name} · <a href={`tel:${r.phone}`} className="text-primary" dir="ltr">{r.phone}</a></p>
-                  <p className="text-sm text-muted-foreground">{r.services?.title ?? "طلب خدمة عام"} — {new Date(r.created_at).toLocaleString("ar-SA")}</p>
-                  {r.message && <p className="mt-1 text-sm">{r.message}</p>}
+              <div key={r.id} className="flex items-start justify-between gap-3 border-b border-border p-4 last:border-0">
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold">{r.name}</p>
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs">
+                      {r.services ? SECTIONS.find((x) => x.id === r.services!.section)?.label ?? "خدمة" : "طلب عام"}
+                    </span>
+                  </div>
+                  <p className="text-sm">الخدمة: <span className="font-medium">{r.services?.title ?? "طلب خدمة غير مسجلة"}</span></p>
+                  <p className="text-sm">الجوال: <a href={`tel:${r.phone}`} className="text-primary" dir="ltr">{r.phone}</a>
+                    {" · "}<a href={`https://wa.me/${r.phone.replace(/\D/g, "").replace(/^0/, "966")}`} target="_blank" rel="noreferrer" className="text-primary">واتساب</a></p>
+                  <p className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString("ar-SA")}</p>
+                  <p className="whitespace-pre-wrap break-words rounded-lg bg-muted/50 p-2 text-sm">{r.message || "بدون رسالة"}</p>
                 </div>
-                <Button size="icon" variant="ghost" aria-label="حذف الطلب" onClick={() => removeRequest(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                <Button size="icon" variant="ghost" className="shrink-0" aria-label="حذف الطلب" onClick={() => removeRequest(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               </div>
             ))}
           </div>

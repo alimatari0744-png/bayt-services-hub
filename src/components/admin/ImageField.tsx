@@ -3,7 +3,6 @@ import { toast } from "sonner";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useImageUrl } from "@/lib/services";
 
 export function ImageField({ label, hint, value, onChange }: { label: string; hint?: string | undefined; value: string; onChange: (value: string) => void }) {
@@ -58,7 +57,7 @@ export function ImageField({ label, hint, value, onChange }: { label: string; hi
         <span className="grid h-16 w-24 shrink-0 place-items-center overflow-hidden rounded-lg border border-border bg-background">
           {shown ? <img src={shown} alt={label} className="h-full w-full object-cover" /> : <span className="text-xs text-muted-foreground">لا صورة</span>}
         </span>
-        <Input dir="ltr" placeholder="https://... أو مسار الصورة" value={value} onChange={(e) => onChange(e.target.value)} className="text-xs" />
+        <p className="text-xs text-muted-foreground">{value ? "اضغط «رفع صورة» لاستبدالها" : "اضغط «رفع صورة» لإرفاق صورة من جهازك"}</p>
       </div>
     </div>
   );
