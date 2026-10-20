@@ -1,9 +1,7 @@
 # Roadmap
 
-## Current
-- Add owner-managed property classifications with shared admin/customer options, explicit property assignments, mobile navigation, and end-to-end filtering verification.
-
 ## Done
+- Owner-managed city/type/purpose classifications shared by property editing and customer browsing; mobile navigation, creation, editing, assignment persistence, rename matching, restricted deletion and anonymous combined filtering verified.
 - All three service sections support free-text specifications followed by + added title/content paragraphs displayed side by side; saving, reopening, public display, and mobile layout verified through the admin UI.
 - Property specification title/content paragraphs with demo entries saved through the admin UI; refreshed RTL dropdowns; footer and request WhatsApp links and request call links verified.
 - Added throttled recovery for stale deployment page modules that previously blanked navigation.
