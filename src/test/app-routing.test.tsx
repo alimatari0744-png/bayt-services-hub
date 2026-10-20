@@ -14,4 +14,12 @@ describe("App routing", () => {
 
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
   });
+  it("matches a dedicated service detail page", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    expect(router.matchRoutes("/services/8b595a13-f9dc-4d42-8f9a-7294d9b66bbc").at(-1)?.routeId).toBe("/services/$id");
+  });
+  it("matches the general service request page", () => {
+    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    expect(router.matchRoutes("/contact").at(-1)?.routeId).toBe("/contact");
+  });
 });

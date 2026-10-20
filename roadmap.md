@@ -1,4 +1,5 @@
-- [ ] Remove general/student category filters and refine four real-estate dropdowns.
-- [ ] Add service detail pages with specifications and geographic links, editable by admin.
-- [ ] Add general contact requests and full navigation labels.
-- [ ] Verify service browsing and request submission.
+- [x] Remove general/student category filters and refine four real-estate dropdowns.
+- [x] Add service detail pages with specifications and geographic links, editable by admin.
+- [x] Add general contact requests and full navigation labels.
+- [x] Verify service browsing and service/general request submission on desktop and mobile.
+- [ ] Verify admin save end-to-end: blocked because no auth account exists; owner must create/sign in to an account.
