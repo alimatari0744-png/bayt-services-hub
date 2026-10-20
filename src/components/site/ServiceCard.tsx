@@ -11,9 +11,10 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
   const map = service.section === "real_estate" ? geographicUrl(service.map_url, service.location) : null;
   return (
     <article
-      className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-lift animate-rise"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-lift animate-rise"
       style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
+      <Link to="/services/$id" params={{ id: service.id }} aria-label={`تفاصيل ${service.title}`} className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" />
       <Link to="/services/$id" params={{ id: service.id }} aria-label={`تفاصيل ${service.title}`} className="relative block aspect-[16/10] overflow-hidden bg-gradient-primary">
         {img ? (
           <img src={img} alt={service.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
@@ -38,12 +39,13 @@ export function ServiceCard({ service, index = 0 }: { service: Service; index?: 
         )}
         <div className="mt-auto flex items-center justify-between pt-3">
           <span className="font-display font-bold text-primary">{service.price || "حسب الطلب"}</span>
-          <RequestDialog service={service} />
+          <span className="relative z-20"><RequestDialog service={service} /></span>
         </div>
-        <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
-          <Button asChild variant="ghost" size="sm"><Link to="/services/$id" params={{ id: service.id }}>تفاصيل الخدمة</Link></Button>
-          {map && <Button asChild variant="ghost" size="icon"><a href={map} target="_blank" rel="noopener noreferrer" aria-label="الموقع الجغرافي" title="الموقع الجغرافي"><MapPin className="h-4 w-4" /></a></Button>}
-        </div>
+        {map && (
+          <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+            <Button asChild variant="ghost" size="icon" className="relative z-20"><a href={map} target="_blank" rel="noopener noreferrer" aria-label="الموقع الجغرافي" title="الموقع الجغرافي"><MapPin className="h-4 w-4" /></a></Button>
+          </div>
+        )}
       </div>
     </article>
   );
