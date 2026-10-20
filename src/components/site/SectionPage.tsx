@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { ArrowDownUp, Building2, ChevronDown, KeyRound, LayoutGrid, MapPin, Search, SlidersHorizontal } from "lucide-react";
 import { servicesQuery, type Section } from "@/lib/services";
@@ -9,27 +9,27 @@ import { ServiceCard } from "./ServiceCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { classificationsQuery, resolvePropertyClassifications } from "@/lib/property-classifications";
 import {
-  DEMO_CITIES,
   EMPTY_PROPERTY_FILTERS,
   PROPERTY_FILTER_LABELS,
-  PROPERTY_PURPOSES,
   PROPERTY_SORTS,
-  PROPERTY_TYPES,
   browseProperties,
   type PropertyFilters,
 } from "@/lib/property-browsing";
 
 const FILTERS = [
-  { key: "city", icon: MapPin, label: PROPERTY_FILTER_LABELS[0], all: "كل المدن", reset: "", options: DEMO_CITIES.map((v) => ({ value: v, label: v })) },
-  { key: "type", icon: Building2, label: PROPERTY_FILTER_LABELS[1], all: "كل الأنواع", reset: "", options: PROPERTY_TYPES.map((v) => ({ value: v, label: v })) },
-  { key: "purpose", icon: KeyRound, label: PROPERTY_FILTER_LABELS[2], all: "كل الأغراض", reset: "", options: PROPERTY_PURPOSES.map((v) => ({ value: v, label: v })) },
+  { key: "city", icon: MapPin, label: PROPERTY_FILTER_LABELS[0], all: "كل المدن", reset: "", options: [] },
+  { key: "type", icon: Building2, label: PROPERTY_FILTER_LABELS[1], all: "كل الأنواع", reset: "", options: [] },
+  { key: "purpose", icon: KeyRound, label: PROPERTY_FILTER_LABELS[2], all: "كل الأغراض", reset: "", options: [] },
   { key: "sort", icon: ArrowDownUp, label: PROPERTY_FILTER_LABELS[3], all: "الأحدث", reset: "newest", options: PROPERTY_SORTS.map((s) => ({ value: s.value, label: s.label })) },
 ] as const;
 
 export function SectionPage({ section }: { section: Section }) {
   const content = useSiteContent();
   const { data: items } = useSuspenseQuery(servicesQuery(section));
+  const { data: classifications = [] } = useQuery({ ...classificationsQuery, enabled: section === "real_estate" });
+  const dropdowns = FILTERS.map((filter) => ({ ...filter, options: filter.key === "sort" ? filter.options : classifications.filter((option) => option.kind === filter.key).map((option) => ({ value: option.label, label: option.label })) }));
   const [q, setQ] = useState("");
   const [filters, setFilters] = useState<PropertyFilters>(EMPTY_PROPERTY_FILTERS);
   const label = sectionText(content, section, "label");
@@ -38,8 +38,8 @@ export function SectionPage({ section }: { section: Section }) {
 
   const results = useMemo(() => {
     const searched = smartSearch(q, items);
-    return section === "real_estate" ? browseProperties(searched, filters) : searched;
-  }, [q, filters, items, section]);
+    return section === "real_estate" ? browseProperties(searched.map((item) => resolvePropertyClassifications(item, classifications)), filters) : searched;
+  }, [q, filters, items, section, classifications]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 md:py-16">
@@ -68,7 +68,7 @@ export function SectionPage({ section }: { section: Section }) {
 
         {section === "real_estate" && (
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {FILTERS.map((dropdown) => (
+            {dropdowns.map((dropdown) => (
               <DropdownMenu key={dropdown.key} dir="rtl">
                 <DropdownMenuTrigger asChild>
                   <Button
