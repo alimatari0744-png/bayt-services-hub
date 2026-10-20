@@ -67,7 +67,7 @@ function Dashboard({ email }: { email: string }) {
   async function remove(id: string) {
     if (!confirm("حذف هذه الخدمة؟")) return;
     const { error } = await supabase.from("services").delete().eq("id", id);
-    if (error) return toast.error("تعذّر الحذف");
+    if (error) { toast.error("تعذّر الحذف"); return; }
     toast.success("تم الحذف");
     load();
   }
@@ -110,7 +110,7 @@ function Dashboard({ email }: { email: string }) {
                 </button>
               ))}
             </div>
-            <Button onClick={() => setEditing({ section, is_active: true, category: SECTIONS[section].categories[0] })}>
+            <Button onClick={() => setEditing({ section, is_active: true, category: SECTIONS[section].categories[0] ?? "" })}>
               <Plus className="h-4 w-4" /> إضافة خدمة
             </Button>
           </div>
@@ -167,13 +167,13 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
   const sec = (form.section ?? "general") as Section;
 
   async function save() {
-    if (!form.title?.trim()) return toast.error("العنوان مطلوب");
+    if (!form.title?.trim()) { toast.error("العنوان مطلوب"); return; }
     setSaving(true);
     let image_url = form.image_url ?? null;
     if (file) {
       const path = `${crypto.randomUUID()}.${file.name.split(".").pop()}`;
       const { error } = await supabase.storage.from("service-images").upload(path, file);
-      if (error) { setSaving(false); return toast.error("تعذّر رفع الصورة"); }
+      if (error) { setSaving(false); { toast.error("تعذّر رفع الصورة"); return; } }
       image_url = path;
     }
     const payload = {
@@ -192,7 +192,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
       ? await supabase.from("services").update(payload).eq("id", form.id)
       : await supabase.from("services").insert(payload);
     setSaving(false);
-    if (error) return toast.error("تعذّر الحفظ");
+    if (error) { toast.error("تعذّر الحفظ"); return; }
     toast.success("تم الحفظ");
     onSaved();
   }

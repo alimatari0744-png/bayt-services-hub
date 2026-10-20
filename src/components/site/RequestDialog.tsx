@@ -17,11 +17,11 @@ export function RequestDialog({ service }: { service: Service }) {
     const name = String(fd.get("name") || "").trim();
     const phone = String(fd.get("phone") || "").trim();
     const message = String(fd.get("message") || "").trim();
-    if (!name || phone.length < 5) return toast.error("يرجى إدخال الاسم ورقم الجوال");
+    if (!name || phone.length < 5) { toast.error("يرجى إدخال الاسم ورقم الجوال"); return; }
     setLoading(true);
     const { error } = await supabase.from("requests").insert({ service_id: service.id, name, phone, message });
     setLoading(false);
-    if (error) return toast.error("تعذّر إرسال الطلب، حاول مجدداً");
+    if (error) { toast.error("تعذّر إرسال الطلب، حاول مجدداً"); return; }
     toast.success("تم استلام طلبك، سنتواصل معك قريباً");
     setOpen(false);
   }
