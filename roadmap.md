@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Property specification title/content paragraphs with demo entries saved through the admin UI; refreshed RTL dropdowns; footer and request WhatsApp links and request call links verified.
 - Added throttled recovery for stale deployment page modules that previously blanked navigation.
 - Investigated login rejection (invalid credentials); removed public account-creation UI and distinguished connectivity errors.
 - Property filters: city, type, purpose, sort (four dropdowns) on the real-estate page.

@@ -3,6 +3,7 @@ import { ArrowRight, Clock, MapPin, PencilRuler, Phone } from "lucide-react";
 import { SECTIONS, useImageUrl, type Service } from "@/lib/services";
 import { sectionText, useSiteContent } from "@/lib/site-content";
 import { RequestForm } from "@/components/site/RequestForm";
+import { parseSpecificationParagraphs } from "@/lib/specification-paragraphs";
 
 export const Route = createFileRoute("/services/$id")({
   head: ({ params }) => ({
@@ -37,6 +38,7 @@ function ServiceDetail() {
   const content = useSiteContent();
   const img = useImageUrl(service.image_url);
   const specifications = service.specifications?.trim() || content["service.spec_fallback"];
+  const paragraphs = service.section === "real_estate" ? parseSpecificationParagraphs(service.specifications) : null;
 
   return (
     <article className="mx-auto max-w-6xl px-4 py-10 md:py-14">
@@ -63,7 +65,12 @@ function ServiceDetail() {
 
       <section className="mt-6 rounded-3xl border border-border bg-card p-6 md:p-8" aria-labelledby="service-specifications">
         <h2 id="service-specifications" className="flex items-center gap-2 text-xl font-bold"><PencilRuler className="h-5 w-5 text-primary" /> {content["service.specifications_title"]}</h2>
-        <p className="mt-4 whitespace-pre-line leading-8">{specifications}</p>
+        {paragraphs?.length ? <dl className="mt-4 divide-y divide-border">
+          {paragraphs.map((paragraph, index) => <div key={index} className="py-4 first:pt-0 last:pb-0">
+            <dt className="break-words text-base font-semibold text-primary">{paragraph.title}</dt>
+            <dd className="mt-2 whitespace-pre-wrap break-words leading-8 text-muted-foreground">{paragraph.content}</dd>
+          </div>)}
+        </dl> : <p className="mt-4 whitespace-pre-line leading-8">{paragraphs ? content["service.spec_fallback"] : specifications}</p>}
       </section>
 
       <section className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-secondary p-5">

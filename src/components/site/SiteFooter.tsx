@@ -1,12 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { Logo } from "./Logo";
 import { useSiteContent } from "@/lib/site-content";
-import { normalizePhone } from "@/lib/phone-auth";
+import { contactLinks } from "@/lib/contact-links";
+import { Button } from "@/components/ui/button";
 
 export function SiteFooter() {
   const content = useSiteContent();
-  const phone = normalizePhone(content["contact.phone"]);
+  const links = contactLinks(content["contact.phone"]);
 
   return (
     <footer className="mt-24 bg-primary text-primary-foreground">
@@ -31,9 +32,14 @@ export function SiteFooter() {
             {content["contact.phone"] && (
               <li className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5" />
-                <a href={`tel:${phone ?? content["contact.phone"]}`} dir="ltr" className="hover:text-gold">{content["contact.phone"]}</a>
+                <a href={links.call} dir="ltr" className="hover:text-gold">{content["contact.phone"]}</a>
               </li>
             )}
+            {links.whatsapp && <li>
+              <Button asChild variant="ghost" size="sm" className="px-0 text-primary-foreground hover:bg-transparent hover:text-gold">
+                <a href={links.whatsapp} target="_blank" rel="noopener noreferrer" title={content["contact.whatsapp_label"]}><MessageCircle />{content["contact.whatsapp_label"]}</a>
+              </Button>
+            </li>}
             {content["contact.email"] && (
               <li className="flex items-center gap-2">
                 <Mail className="h-3.5 w-3.5" />
