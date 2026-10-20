@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Done
+- Property specification title/content paragraphs with demo entries saved through the admin UI; refreshed RTL dropdowns; footer and request WhatsApp links and request call links verified.
 - Added throttled recovery for stale deployment page modules that previously blanked navigation.
 - Investigated login rejection (invalid credentials); removed public account-creation UI and distinguished connectivity errors.
 - Property filters: city, type, purpose, sort (four dropdowns) on the real-estate page.
@@ -12,7 +13,6 @@
 - Self-hosting path added: `DEPLOY_PRESET=vercel` build switch in vite.config.ts + README deploy guide.
 
 ## Open
-- Current request: editable property specification paragraphs, demo paragraphs saved through administration, redesigned property dropdowns, footer WhatsApp, and request call/WhatsApp icons.
 - Owner to replace demo contact details (email, address, opening hours) from Settings.
 - Real map links for each property listing (needs the owner's actual URLs).
 - GitHub connection: settings → Git in the project.
