@@ -7,3 +7,5 @@
 - [x] Add a distinct demo photograph for every existing service.
 - [x] Place specifications below the title, restrict location to properties, and close mobile navigation on outside clicks.
 - [x] Verify all 12 images, detail order, property links and mobile menu dismissal; 16 tests pass.
+- [ ] Replace property browsing with city, type, purpose and price/newest sort dropdowns; verify combined filtering.
+- [ ] Explain how to return to the project's GitHub settings.
