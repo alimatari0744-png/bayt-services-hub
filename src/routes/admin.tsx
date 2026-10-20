@@ -14,7 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PROPERTY_CATEGORIES, geographicUrl } from "@/lib/service-filters";
 import { contactLinks } from "@/lib/contact-links";
-import { parseSpecificationParagraphs, serializeSpecificationParagraphs, type SpecificationParagraph } from "@/lib/specification-paragraphs";
+import { parseServiceSpecifications, serializeServiceSpecifications, type SpecificationParagraph } from "@/lib/specification-paragraphs";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -254,9 +254,9 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
   const [paragraphs, setParagraphs] = useState<SpecificationParagraph[]>([]);
   const current = useImageUrl(form.image_url);
   useEffect(() => {
-    setForm(value ?? {});
-    const structured = parseSpecificationParagraphs(value?.specifications);
-    setParagraphs(structured ?? (value?.specifications?.trim() ? [{ title: "مواصفات الخدمة", content: value.specifications }] : []));
+    const structured = parseServiceSpecifications(value?.specifications);
+    setForm({ ...value, specifications: structured.text });
+    setParagraphs(structured.paragraphs);
     setFile(null);
   }, [value]);
 
@@ -265,7 +265,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
 
   async function save() {
     if (!form.title?.trim()) { toast.error("العنوان مطلوب"); return; }
-    if (sec === "real_estate" && paragraphs.some((paragraph) => !paragraph.title.trim() || !paragraph.content.trim())) { toast.error("أدخل عنوان ومحتوى كل فقرة"); return; }
+    if (paragraphs.some((paragraph) => !paragraph.title.trim() || !paragraph.content.trim())) { toast.error("أدخل عنوان ومحتوى كل فقرة"); return; }
     if (sec === "real_estate" && !PROPERTY_CATEGORIES.some((c) => c === form.category)) { toast.error("اختر أحد التصنيفات العقارية الأربعة"); return; }
     if (sec === "real_estate" && form.map_url?.trim() && !geographicUrl(form.map_url.trim(), null)) { toast.error("أدخل رابط موقع صحيحاً يبدأ بـ https://"); return; }
     setSaving(true);
@@ -280,7 +280,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
       section: sec,
       category: sec === "real_estate" ? form.category ?? "" : "",
       subcategory: sec === "real_estate" ? form.subcategory?.trim() ?? "" : "",
-      specifications: sec === "real_estate" ? serializeSpecificationParagraphs(paragraphs) : form.specifications ?? "",
+      specifications: serializeServiceSpecifications({ text: form.specifications ?? "", paragraphs }),
       map_url: sec === "real_estate" ? form.map_url?.trim() || null : null,
       title: form.title.trim(),
       description: form.description ?? "",
@@ -321,10 +321,12 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
             <Input id="subcategory" placeholder="التصنيف الفرعي" maxLength={100} value={form.subcategory ?? ""} onChange={(e) => set("subcategory", e.target.value)} />
           </div>}
           <Textarea placeholder="الوصف" value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} />
-          {sec === "real_estate" ? <div className="space-y-3 border-y border-border py-4">
+          <div className="space-y-3 border-y border-border py-4">
+            <label className="block text-sm" htmlFor="specifications">مواصفات الخدمة وتفاصيلها</label>
+            <Textarea id="specifications" rows={5} value={form.specifications ?? ""} onChange={(e) => set("specifications", e.target.value)} />
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-sm font-semibold">فقرات مواصفات الخدمة</h3>
-              <Button type="button" size="sm" variant="outline" onClick={() => setParagraphs((current) => [...current, { title: "", content: "" }])}><Plus /> إضافة فقرة</Button>
+              <Button type="button" size="icon" variant="outline" aria-label="إضافة فقرة" title="إضافة فقرة" onClick={() => setParagraphs((current) => [...current, { title: "", content: "" }])}><Plus /></Button>
             </div>
             {paragraphs.map((paragraph, index) => <div key={index} className="space-y-2 border-b border-border pb-3 last:border-0 last:pb-0">
               <div className="flex items-end gap-2">
@@ -337,10 +339,7 @@ function ServiceForm({ value, onClose, onSaved }: { value: Partial<Service> | nu
               <label htmlFor={`paragraph-content-${index}`} className="block text-sm">محتوى الفقرة {index + 1}</label>
               <Textarea id={`paragraph-content-${index}`} rows={3} value={paragraph.content} onChange={(event) => setParagraphs((current) => current.map((item, i) => i === index ? { ...item, content: event.target.value } : item))} />
             </div>)}
-          </div> : <>
-            <label className="block text-sm" htmlFor="specifications">مواصفات الخدمة وتفاصيلها</label>
-            <Textarea id="specifications" rows={5} value={form.specifications ?? ""} onChange={(e) => set("specifications", e.target.value)} />
-          </>}
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <Input placeholder="السعر" value={form.price ?? ""} onChange={(e) => set("price", e.target.value)} />
             <Input placeholder="الموقع" value={form.location ?? ""} onChange={(e) => set("location", e.target.value)} />
