@@ -12,6 +12,7 @@
 - Self-hosting path added: `DEPLOY_PRESET=vercel` build switch in vite.config.ts + README deploy guide.
 
 ## Open
+- Current request: editable property specification paragraphs, demo paragraphs saved through administration, redesigned property dropdowns, footer WhatsApp, and request call/WhatsApp icons.
 - Owner to replace demo contact details (email, address, opening hours) from Settings.
 - Real map links for each property listing (needs the owner's actual URLs).
 - GitHub connection: settings → Git in the project.
