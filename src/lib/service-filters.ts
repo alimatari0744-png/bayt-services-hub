@@ -1,5 +1,9 @@
 export const PROPERTY_CATEGORIES = ["شقق", "فلل", "أراضي", "محلات تجارية"] as const;
 
+export function propertyLocation(section: string, location: string | null | undefined) {
+  return section === "real_estate" ? location?.trim() || null : null;
+}
+
 export function categoryFilters(section: string): readonly string[] {
   return section === "real_estate" ? PROPERTY_CATEGORIES : [];
 }
