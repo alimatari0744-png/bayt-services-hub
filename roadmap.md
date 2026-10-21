@@ -1,5 +1,10 @@
 # Roadmap
 
+## Current
+- Compare general services with the uploaded PDF and remove only entries absent from it.
+- Clear unlisted general-service prices and verify empty admin values / on-request customer display.
+- Add one meaningful image to each PDF service and verify images in administration and public pages.
+
 ## Done
 - Imported all 64 services from the uploaded general-services PDF: added 61 without duplicating three existing services or inventing prices/specifications; database confirms 65 active general services including the pre-existing driving service. Authenticated administration list, imported-service editor and public detail verified.
 - Removed map actions from browsing cards; mobile browser checks confirm property details retain the map beside the price and all sections show price before specifications without general/student location links.
