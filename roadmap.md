@@ -1,5 +1,8 @@
 # Roadmap
 
+## In progress
+- Import the uploaded general-services PDF into services without inventing prices or specifications; verify saved rows and authenticated administration display.
+
 ## Done
 - Removed map actions from browsing cards; mobile browser checks confirm property details retain the map beside the price and all sections show price before specifications without general/student location links.
 - Price directly below service image before specifications; old information band removed, admin price labeled, visibility/keyword inputs removed, common English hints inferred from Arabic content (tests passed).
