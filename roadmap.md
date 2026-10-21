@@ -1,9 +1,7 @@
 # Roadmap
 
-## In progress
-- Import the uploaded general-services PDF into services without inventing prices or specifications; verify saved rows and authenticated administration display.
-
 ## Done
+- Imported all 64 services from the uploaded general-services PDF: added 61 without duplicating three existing services or inventing prices/specifications; database confirms 65 active general services including the pre-existing driving service. Authenticated administration list, imported-service editor and public detail verified.
 - Removed map actions from browsing cards; mobile browser checks confirm property details retain the map beside the price and all sections show price before specifications without general/student location links.
 - Price directly below service image before specifications; old information band removed, admin price labeled, visibility/keyword inputs removed, common English hints inferred from Arabic content (tests passed).
 - Free Leaflet/OpenStreetMap property picker replaces coordinate inputs; manual point selection, device location, save/reopen, customer map URL and temporary-data cleanup verified through authenticated UI. Google Maps destination itself remains unverified.
